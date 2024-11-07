@@ -4,6 +4,5 @@
   <groupId>org.zy</groupId>
   <artifactId>mall_zy</artifactId>
   <version>1.0-SNAPSHOT</version>
-  <name>Archetype - mall_zy</name>
   <url>http://maven.apache.org</url>
 </project>
