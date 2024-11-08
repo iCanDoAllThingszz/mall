@@ -96,7 +96,7 @@ ESB: 企业服务总线, 用于连接不同的服务, 实现服务之间的通�
 
 Bus消息总线，实现异步化的通信机制。
 
-### 2.10 链路监控
+##### 2.10 链路监控
 
 因为微服务中的服务实在是太多了，为了能更好的监控个服务的情况，肯定就需要链路监控服务，我们可以通过sleuth+zipkin来实现，应用层监控，系统级监控
 
@@ -105,10 +105,124 @@ Bus消息总线，实现异步化的通信机制。
 这里我们准备的是阿里云服务器: https://swasnext.console.aliyun.com/servers/cn-beijing
 
 ##### 3.2 Docker安装
+CentOS7安装Docker: https://docs.docker.com/engine/install/centos/
 
+1. 卸载原有环境
+```shell
+sudo yum remove docker \ 
+                  docker-client \ 
+                  docker-client-latest \ 
+                  docker-common \ 
+                  docker-latest \ 
+                  docker-latest-logrotate \ 
+                  docker-logrotate \ 
+                  docker-engine
+```
 
+2. 安装依赖环境和镜像地址
+```shell
+sudo yum install -y yum-utils
+```
 
+设置官方镜像地址
+```shell
+sudo yum-config-manager \
+    --add-repo \
+    https://download.docker.com/linux/centos/docker-ce.repo
+```
 
+设置阿里云镜像地址
+```shell
+sudo yum-config-manager \
+    --add-repo \
+    http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
+```
+
+安装docker CE
+```shell
+sudo yum install -y docker-ce docker-ce-cli containerd.io
+```
+
+启动docker
+```shell
+systemctl start docker
+```
+
+查询docker中正在运行的容器信息
+```shell
+# docker ps命令用于列出当前正在运行的Docker容器。它会显示容器的ID、名称、状态、端口映射等信息
+docker ps
+
+# CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+```
+
+查询docker中所有容器信息, 不管有没有在运行
+```shell
+docker ps -a
+```
+
+删除docker容器
+```shell
+docker rm 容器ID
+```
+
+查看docker版本
+```shell
+docker version
+```
+
+设置docker服务开机自动启动
+```shell
+systemctl enable docker
+```
+
+##### 3.3 Docker中安装mysql数据库
+为了后续做CICD, 我们在docker中安装必要软件
+
+拉取mysql5.7镜像
+```shell
+docker pull mysql:5.7
+```
+> 因为docker国内被墙了, 所以我们需要使用国内的镜像仓库, 配置方法参考:https://blog.csdn.net/Lichen0196/article/details/137355517
+> 但是这个blog中给出的镜像数据源也不太行, 镜像数据源可以使用:
+
+```json
+{
+  "registry-mirrors": [
+    "https://docker.fxxk.dedyn.io",
+    "https://docker.m.daocloud.io",
+    "https://docker.1panel.live"
+  ]
+}
+```
+
+查看docker镜像信息
+```shell
+docker images
+
+# REPOSITORY   TAG       IMAGE ID       CREATED         SIZE
+# mysql        5.7       5107333e08a8   11 months ago   501MB
+```
+
+基于mysql5.7镜像启动容器:
+```shell
+# 基于mysql5.7镜像启动容器, 容器中端口为3306(第二个), 宿主机端口也为3306(第一个), 容器名称为mysql, -v 数据挂载信息(容器中哪些目录下的信息挂载到宿主机的哪些目录下) -e: 设置root账号的默认密码为root
+docker run -p 3306:3306 --name mysql -v /mydata/mysql/log:/var/log/mysql -v /mydata/mysql/data:/var/lib/mysql -v /mydata/mysql/conf:/etc/mysql/conf.d -e MYSQL_ROOT_PASSWORD=root -d mysql:5.7
+```
+
+docker启动mysql容器时, 发生了问题 容器一启动就挂, 可以通过以下命令查看容器日志
+```shell
+docker logs <container_id>
+```
+
+docker启动mysql容器立马挂掉, 通过日志看是不能读取'/etc/mysql/conf.d/目录的解决方法: https://www.cnblogs.com/wxxf/p/17854020.html
+
+再次执行docker ps命令后, 确认mysql容器已经启动
+```shell
+[root@iZ2ze9afrj51kl498kmdwkZ ~]# docker ps
+CONTAINER ID   IMAGE       COMMAND                  CREATED          STATUS          PORTS                               NAMES
+2b138bd7cdd3   mysql:5.7   "docker-entrypoint.s…"   41 minutes ago   Up 41 minutes   0.0.0.0:3306->3306/tcp, 33060/tcp   mysql
+```
 
 
 # 四、业务开发
