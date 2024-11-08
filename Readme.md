@@ -183,7 +183,7 @@ systemctl enable docker
 ```shell
 docker pull mysql:5.7
 ```
-> 因为docker国内被墙了, 所以我们需要使用国内的镜像仓库, 配置方法参考:https://blog.csdn.net/Lichen0196/article/details/137355517
+> 因为docker国内被墙了, 所以我们需要使用国内的镜像仓库, 配置方法参考: https://blog.csdn.net/Lichen0196/article/details/137355517 <br/>
 > 但是这个blog中给出的镜像数据源也不太行, 镜像数据源可以使用:
 
 ```json
@@ -223,6 +223,82 @@ docker启动mysql容器立马挂掉, 通过日志看是不能读取'/etc/mysql/c
 CONTAINER ID   IMAGE       COMMAND                  CREATED          STATUS          PORTS                               NAMES
 2b138bd7cdd3   mysql:5.7   "docker-entrypoint.s…"   41 minutes ago   Up 41 minutes   0.0.0.0:3306->3306/tcp, 33060/tcp   mysql
 ```
+
+在宿主机的/mydata/mysql/conf目录下设置配置文件my.cnf:
+```xml
+[client]
+default-character-set=utf8
+
+[mysql]
+default-character-set=utf8
+
+[mysqld]
+init_connect="SET collation_connection = utf8_unicode_ci"
+init_connect="SET NAMES utf8"
+character-set-server=utf8
+collation-server=utf8_unicode_ci
+skip-character-set-client-handshake
+skip-name-resolve
+```
+重启docker-mysql容器:
+```shell
+docker restart <container_id>
+
+[root@iZ2ze9afrj51kl498kmdwkZ conf]# docker ps
+CONTAINER ID   IMAGE       COMMAND                  CREATED       STATUS       PORTS                               NAMES
+2b138bd7cdd3   mysql:5.7   "docker-entrypoint.s…"   4 hours ago   Up 4 hours   0.0.0.0:3306->3306/tcp, 33060/tcp   mysql
+[root@iZ2ze9afrj51kl498kmdwkZ conf]# docker restart 2b
+2b
+```
+连接数据库(root:root)
+
+##### 3.4 Docker中安装Redis
+拉取Redis最新版本镜像
+```shell
+docker pull redis
+```
+
+根据Redis镜像文件创建容器
+```shell
+# -d:后台运行 -p:端口映射 -v:数据挂载 --name:容器名称
+docker run -d -p 6379:6379 --name mall-redis -v /mydata/redis/data:/data -v /mydata/redis/conf:/etc/redis  redis redis-server /etc/redis/redis.conf
+```
+因为配置了目录挂载, 所以如果报错 `Fatal error, can't open config file '/etc/redis/redis.conf': No such file or directory`, 我们在/mydata/redis/conf下创建redis.conf文件即可
+
+重新启动容器即可:
+```shell
+[root@iZ2ze9afrj51kl498kmdwkZ conf]# docker ps
+CONTAINER ID   IMAGE       COMMAND                  CREATED         STATUS          PORTS                               NAMES
+83bffad12ab5   redis       "docker-entrypoint.s…"   2 seconds ago   Up 1 second     0.0.0.0:6379->6379/tcp              mall-redis
+2b138bd7cdd3   mysql:5.7   "docker-entrypoint.s…"   5 hours ago     Up 11 minutes   0.0.0.0:3306->3306/tcp, 33060/tcp   mysql
+```
+
+进入redis容器内部:
+```shell
+docker exec -it <container_id> /bin/bash
+```
+
+在redis容器内部尝试连接redis:
+```shell
+root@83bffad12ab5:/data# redis-cli
+127.0.0.1:6379> set name zhangsan
+OK
+127.0.0.1:6379> get zhangsan
+(nil)
+127.0.0.1:6379> get name
+"zhangsan
+```
+
+设置mysql容器和redis容器开机自启动:
+```shell
+docker update --restart=always <container_id>
+```
+
+重要: 修改/mydata/redis/conf/redis.conf文件中的bind 127.0.0.1为bind 0.0.0.0(从只允许本机访问改成允许所有ip访问), 修改protected-mode为no。参考 https://developer.aliyun.com/article/792302
+
+idea连接redis, ok
+
+##### 3.5 开发环境准备
 
 
 # 四、业务开发
