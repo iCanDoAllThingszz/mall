@@ -1,0 +1,15 @@
+[submodule "mall-product"]
+	path = mall-product
+	url = https://github.com/iCanDoAllThingszz/mall.git
+[submodule "mall-order"]
+	path = mall-order
+	url = https://github.com/iCanDoAllThingszz/mall.git
+[submodule "mall-member"]
+	path = mall-member
+	url = https://github.com/iCanDoAllThingszz/mall.git
+[submodule "mall-ware"]
+	path = mall-ware
+	url = https://github.com/iCanDoAllThingszz/mall.git
+[submodule "mall-coupon"]
+	path = mall-coupon
+	url = https://github.com/iCanDoAllThingszz/mall.git
