@@ -286,7 +286,7 @@ OK
 127.0.0.1:6379> get zhangsan
 (nil)
 127.0.0.1:6379> get name
-"zhangsan
+"zhangsan"
 ```
 
 设置mysql容器和redis容器开机自启动:
@@ -298,7 +298,23 @@ docker update --restart=always <container_id>
 
 idea连接redis, ok
 
-##### 3.5 开发环境准备
+##### 3.5 本地开发环境准备
+1. jdk 1.8
+2. idea + web storm
+3. git
+
+##### 3.6 父工程创建
+mall_zy(pom项目, 做版本控制用)
+
+##### 3.7 相关微服务模块创建
+- 商品 mall-product
+- 订单 mall-order
+- 会员 mall-member
+- 库存 mall-ware
+- 优惠活动 mall-coupon
+
+##### 3.8 gitignore文件配置
+
 
 
 # 四、业务开发
