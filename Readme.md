@@ -343,14 +343,42 @@ mall_zy(pom项目, 做版本控制用)
 根据renren-fast/db/下的.sql文件创建数据库表
 
 ##### 3.11 后端服务启动配置
+启动renren-fast服务, 启动类: RenrenApplication
 
+##### 3.12 前端服务搭建
+前端服务: renren-fast-vue
+
+安装node.js
+
+启动renren-fast-vue参考: https://github.com/renrenio/renren-fast-vue/wiki/Getting-started
+
+> ps: 这个前端中用到的依赖 如node-sass等不支持mac的arm64架构, 前端项目放弃了
+
+##### 3.13 generator系统搭建
+使用renren-generator生成代码(通过模版文件生成)
+
+修改renren-generator的application.yml, generator.properties配置文件, 生成我们各个数据库下的模版代码
+
+启动renren-generator, 访问localhost:9999, 生成对应数据库的非业务crud代码
+
+##### 3.14 common模块搭建
+mall-common模块中存放一些公共的代码, 比如异常处理类, 工具类等
+
+对renren-generator生成的代码修改导入的依赖, 修改报错的代码, 使项目能够正常启动
+
+##### 3.15 mybatis-plus整合
 
 
 
 
 # 四、业务开发
-
+## 1. 后台管理系统
+## 2. 基础业务
+## 3. 商城业务
 
 
 # 五、上线部署
+## 1. K8S
+## 2. Kubesphere
+## 3. 集群部署
 

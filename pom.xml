@@ -22,6 +22,8 @@
     <module>mall-ware</module>
     <module>mall-coupon</module>
     <module>renren-fast</module>
+    <module>renren-generator</module>
+    <module>mall-common</module>
   </modules>
 
   <dependencyManagement>
