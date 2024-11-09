@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
+    <data-source source="LOCAL" name="阿里云服务器8.152.0.119" uuid="21ba44d8-faee-4bca-b707-6ea7d98d0e66">
+      <driver-ref>mysql.8</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
+      <jdbc-url>jdbc:mysql://8.152.0.119:3306</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
+    <data-source source="LOCAL" name="redis" uuid="1a894e84-3d09-414d-838b-0773021f9eef">
+      <driver-ref>redis</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>jdbc.RedisDriver</jdbc-driver>
+      <jdbc-url>jdbc:redis://8.152.0.119:6379/0</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
+  </component>
+</project>
