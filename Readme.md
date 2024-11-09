@@ -313,7 +313,38 @@ mall_zy(pom项目, 做版本控制用)
 - 库存 mall-ware
 - 优惠活动 mall-coupon
 
+> 解决git将子模块误认为子系统模块的问题(github文件夹有向右的白色箭头且不能打开): https://www.jianshu.com/p/28e61a24d847
+
 ##### 3.8 gitignore文件配置
+
+##### 3.9 数据库表创建
+- mall_pms 商品数据库
+- mall_oms 订单数据库
+- mall_ums 会员数据库
+- mall_wms 库存数据库
+- mall_sms 优惠活动数据库
+
+执行./sql/下对应数据库的.sql文件, 在对应数据库下创建表
+
+##### 3.10 服务创建和数据库配置
+前端: Vue + ElementUI <br/>
+后端: SpringBoot + MyBatisPlus
+
+我们在本项目中使用人人开源中提供的模版项目来实现快速的项目构建: https://github.com/renrenio  https://gitee.com/renrenio
+
+使用到的模版项目有:
+- renren-fast: 后端模版
+- renren-generator: 代码生成器
+- renren-fast-vue: 前端模版
+
+1. renren-fast: <br/>
+修改renren-fast中application.yml配置文件, 创建对应的数据库 renren_fast
+
+根据renren-fast/db/下的.sql文件创建数据库表
+
+##### 3.11 后端服务启动配置
+
+
 
 
 

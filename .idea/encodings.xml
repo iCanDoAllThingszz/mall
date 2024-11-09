@@ -11,6 +11,12 @@
     <file url="file://$PROJECT_DIR$/mall-product/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/mall-ware/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/mall-ware/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/renren-fast/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/sql/mall_oms.sql" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/sql/mall_pms.sql" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/sql/mall_sms.sql" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/sql/mall_ums.sql" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/sql/mall_wms.sql" charset="GBK" />
     <file url="file://$PROJECT_DIR$/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/resources" charset="UTF-8" />
   </component>
