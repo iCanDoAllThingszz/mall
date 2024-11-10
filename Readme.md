@@ -64,21 +64,31 @@ ESB: 企业服务总线, 用于连接不同的服务, 实现服务之间的通�
 
 常用的RPC框架有:Dubbo,Google的GRPC，Apache的Thrift，微博的Motan，京东的EasyRPC等。我们通过RPC框架可以取调用服务提供者提供的服务，但有一个前提是我们要能找到这个服务。通常我们的服务部署都是集群多节点的部署，所以在消费者这端就不可能直接写死在代码里面，这时就涉及到了服务的发现问题，这时就需要另一个组件注册中心了
 
+![img_11.png](img_11.png)
+
 #####  2.4 注册中心
 
 注册中心实现服务地址管理的功能，解决服务动态感知(上线，下线)。
+
+![img_12.png](img_12.png)
 
 #####  2.5 负载均衡
 
 在服务注册中心的介绍中我们可以看到负载均衡的应用。我们可以通过Ribbon来实现客户端的负载均衡，负载均衡的策略可以是：轮询，随机，根据响应时间来计算权重的轮询等。
 
+![img_13.png](img_13.png)
+
 #####  2.6 配置中心
 
 在微服务架构中我们有很多个服务，而每个服务中是都会有单独的配置文件的。里面有很多的配置信息的有关联的，而且对于后期的更新维护也会非常的不方便，这时配置中心就上场了。常用的配置中心有：apollo/Nacos/disconf/zookeeper/diamond/Spring Cloud Config
 
+![img_14.png](img_14.png)
+
 #####  2.7 网关
 
 网关可以帮助我们完成用户请求的入口，路由。完成统一授权，日志的记录，权限的认证和限流及熔断操作。
+
+![img_15.png](img_15.png)
 
 #####  2.8 限流、降级、缓存
 
@@ -92,13 +102,19 @@ ESB: 企业服务总线, 用于连接不同的服务, 实现服务之间的通�
 
 容错机制：服务出现挂机，宕机之后的处理机制。
 
+![img_16.png](img_16.png)
+
 ##### 2.9 Bus
 
 Bus消息总线，实现异步化的通信机制。
 
+![img_17.png](img_17.png)
+
 ##### 2.10 链路监控
 
 因为微服务中的服务实在是太多了，为了能更好的监控个服务的情况，肯定就需要链路监控服务，我们可以通过sleuth+zipkin来实现，应用层监控，系统级监控
+
+![img_18.png](img_18.png)
 
 # 三、环境准备
 ##### 3.1 虚拟机准备
@@ -367,8 +383,96 @@ mall-common模块中存放一些公共的代码, 比如异常处理类, 工具�
 对renren-generator生成的代码修改导入的依赖, 修改报错的代码, 使项目能够正常启动
 
 ##### 3.15 mybatis-plus整合
+添加mybatis-plus依赖, mysql数据库依赖
+```xml
+<!--mybatis-plus-->
+<dependency>
+    <groupId>com.baomidou</groupId>
+    <artifactId>mybatis-plus-boot-starter</artifactId>
+    <version>3.5.2</version>
+    <scope>compile</scope>
+</dependency>
+<!--mysql-->
+<dependency>
+    <groupId>mysql</groupId>
+    <artifactId>mysql-connector-java</artifactId>
+    <version>8.0.11</version>
+</dependency>
+```
 
+完成mybatis-plus的配置, mall-product: application.yaml
 
+配置完成后在MallProductApplicationTests中测试成功
+
+##### 3.16 各微服务代码生成
+为mall_oms(9991), mall_pms(9990), mall_sms(9992), mall_ums(9993), mall_wms(9994)分别生成代码
+
+##### 3.17 SpringCloud Netflix介绍
+![img_10.png](img_10.png)
+
+前端不要直接调用后端, 要经过nginx -> 网关
+
+netflix已经不再维护了, 也没有springcloud alibaba好用, 不推荐使用
+
+##### 3.18 SpringCloud Alibaba介绍
+注意: springboot和spring cloud alibaba的版本要对应, 否则可能会有问题(官网有版本对应), 这里我们使用的是springboot 2.4.12, spring cloud alibaba 2021.1
+
+我们会使用到的微服务组件:
+- 注册中心: Nacos
+- 配置中心: Nacos
+- 负载均衡: Ribbon
+- 声明式服务调用: OpenFeign
+- 服务容错: Sentinel
+- 网关: Gateway
+- 链路监控: Sleuth
+- 分布式事务: Seata
+- 消息队列: RabbitMQ
+
+##### 3.19 下载nacos服务
+本机的nacos放在了/opt/nacos
+
+linux/unix/mac下单机启动naocs服务(是一个springboot服务):
+```shell
+sh startup.sh -m standalone
+```
+服务启动之后访问localhost:8848/nacos即可
+
+![img_19.png](img_19.png)
+
+##### 3.20 nacos 微服务注册
+1. 修改pom.xml文件 添加nacos依赖
+```xml
+<!--nacos服务注册-->
+<dependency>
+    <groupId>com.alibaba.cloud</groupId>
+    <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+</dependency> 
+```
+
+2. 启动类上加 @EnableDiscoveryClient 注解
+
+3. 修改application.yml文件, 添加nacos配置
+```yaml
+spring:
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8848 
+```
+
+注意, 我们还需要导入spring-cloud-starter-bootstrap依赖, 否则报错ClassNotFoundException
+```xml
+  <dependencies>
+    <dependency>
+      <groupId>org.springframework.cloud</groupId>
+      <artifactId>spring-cloud-starter-bootstrap</artifactId>
+      <version>3.0.3</version>
+    </dependency>
+  </dependencies>
+```
+完成其他微服务模块的注册中心配置(1.pom.xml 2.启动类 3.application.yaml)
+
+##### 3.21 Doker容器中安装
 
 
 # 四、业务开发
