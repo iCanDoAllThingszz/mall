@@ -1,9 +1,13 @@
 package com.zy.mallorder;
 
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 
 @SpringBootApplication
+@MapperScan("com.zy.mallorder.dao")
+@EnableDiscoveryClient
 public class MallOrderApplication {
 
     public static void main(String[] args) {
