@@ -24,6 +24,7 @@
     <module>renren-fast</module>
     <module>renren-generator</module>
     <module>mall-common</module>
+    <module>mall-gateway</module>
   </modules>
 
   <dependencies>
@@ -31,6 +32,12 @@
       <groupId>org.springframework.cloud</groupId>
       <artifactId>spring-cloud-starter-bootstrap</artifactId>
       <version>3.0.3</version>
+    </dependency>
+    <!--nacos配置中心-->
+    <dependency>
+      <groupId>com.alibaba.cloud</groupId>
+      <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
+      <version>2021.1</version>
     </dependency>
   </dependencies>
 
@@ -50,6 +57,11 @@
         <groupId>com.alibaba.cloud</groupId>
         <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
         <version>2021.1</version>
+      </dependency>
+      <!--nacos配置中心-->
+      <dependency>
+        <groupId>com.alibaba.cloud</groupId>
+        <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
       </dependency>
     </dependencies>
   </dependencyManagement>

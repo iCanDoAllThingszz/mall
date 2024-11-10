@@ -32,6 +32,12 @@
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-openfeign</artifactId>
         </dependency>
+        <!--load balancer组件 openfeign调用者必备-->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-loadbalancer</artifactId>
+            <version>3.1.0</version>
+        </dependency>
         <!--springboot test-->
         <dependency>
             <groupId>org.springframework.boot</groupId>

@@ -7,11 +7,7 @@ import java.util.Map;
 import com.zy.mall.common.utils.PageUtils;
 import com.zy.mall.common.utils.R;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.zy.mallproduct.entity.BrandEntity;
 import com.zy.mallproduct.service.BrandService;
@@ -30,6 +26,16 @@ import com.zy.mallproduct.service.BrandService;
 public class BrandController {
     @Autowired
     private BrandService brandService;
+
+    //OpenFeign服务提供接口
+    @GetMapping("/all")
+    public R queryAllBrand(){
+        BrandEntity brandEntity = new BrandEntity();
+        brandEntity.setName("huawei");
+        brandEntity.setBrandId(100L);
+        return R.ok().put("brands", brandEntity);
+    }
+
 
     /**
      * 列表

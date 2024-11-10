@@ -473,7 +473,307 @@ spring:
 完成其他微服务模块的注册中心配置(1.pom.xml 2.启动类 3.application.yaml)
 
 ##### 3.21 Doker容器中安装
+在docker中安装nacos
 
+拉取nacos镜像文件
+```shell
+docker pull nacos/nacos-server:latest
+```
+
+> 这里我们nacos的版本是2.4.3
+
+启动nacos容器:
+```shell
+# -d 后台运行模式 -e 设置环境变量 -v 设置挂载目录 --name 设置容器名称 -p 设置端口映射 nacos/nacos-server:1.4.2 镜像名称
+docker run -d -e MODE=standalone -v /mydata/nacos/conf:/home/nacos/conf --name nacos -p 8848:8848 nacos/nacos-server:latest
+```
+
+然后需要:
+1. 在/mydata/nacos/conf下新增配置文件
+2. 修改nacos的数据源为mysql
+3. 修改nacos的账号密码, 参考: https://nacos.io/docs/latest/manual/admin/auth/
+```shell
+(base) zhaoyu@MBP-W12T7NRJFQ-1817 ~ % curl -X POST '8.152.0.119:8848/nacos/v1/auth/users/admin' -d 'password=nacos' 
+{"username":"nacos","password":"nacos"}
+```
+4. 配置nacos开机启动
+```shell
+docker update --restart=always nacos
+```
+5. 修改我们微服务模块的nacos配置
+
+```yaml
+spring:
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 8.152.0.119:8848
+        username: nacos
+        password: nacos
+```
+##### 3.22 OpenFeign服务调用
+OpenFeign是一个声明式的服务调用组件, 本质上是封装了Ribbon和RestTemplate, 实现了负载均衡和Rest调用, 我们用它来实现服务间的调用
+
+1. 在服务提供者模块中定义服务提供接口
+2. 在服务消费者中调用服务提供者的服务
+
+我们用 mall-order(服务调用者) 和 mall-product(服务提供者) 来做服务调用测试
+
+1. mall-product -> BrandController (服务提供者):
+```java
+    //OpenFeign服务提供接口
+    @GetMapping("/all")
+    public R queryAllBrand(){
+        BrandEntity brandEntity = new BrandEntity();
+        brandEntity.setName("huawei");
+        brandEntity.setBrandId(100L);
+        return R.ok().put("brands", brandEntity);
+    }
+```
+2. mall-order (服务调用)
+- 引入相关的依赖
+```xml
+<!--openfeign-->
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-openfeign</artifactId>
+</dependency>
+<!--load balancer组件 openfeign调用者必备-->
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-loadbalancer</artifactId>
+    <version>3.1.0</version>
+</dependency>
+```
+- 创建对应的Feign接口: ProductOpenFeignService
+```java
+@FeignClient(name="mall-product") // 说明要调用的服务名称
+public interface ProductOpenFeignService {
+
+    //需要访问的远程方法
+    @GetMapping("mallproduct/brand/all")
+    public R queryAllBrand();
+}
+```
+- 启动类新增@EnableFeignClients注解， 开启远程调用功能
+```java
+@SpringBootApplication
+@MapperScan("com.zy.mallorder.dao")
+@EnableDiscoveryClient
+@EnableFeignClients(basePackages = "com.zy.mallorder.feign")
+public class MallOrderApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(MallOrderApplication.class, args);
+    }
+
+}
+```
+3. 测试 访问localhost:9991/malloms/order/feign
+```java
+@RestController
+@RequestMapping("malloms/order")
+public class OrderController {
+    @Autowired
+    private OrderService orderService;
+
+    @Autowired
+    private ProductOpenFeignService productOpenFeignService;
+
+    //测试openFeign服务调用
+    @GetMapping("feign")
+    public R testFeign() {
+        return productOpenFeignService.queryAllBrand();
+    }
+}
+```
+
+**测试:** 
+0. 启动mall-product和mall-order服务
+1. mall-product和mall-order都注册到了nacos
+2. 访问 http://localhost:9991/malloms/order/feign, 成功返回结果
+
+##### 3.23 Nacos配置中心基本使用
+在mall-order测试nacos配置中心使用
+
+1. 引入nacos-config依赖
+```xml
+<!--nacos配置中心-->
+<dependency>
+    <groupId>com.alibaba.cloud</groupId>
+    <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
+    <version>2021.1</version>
+</dependency>
+```
+
+2. 创建bootstrap.yaml文件, 添加nacos配置中心配置(bootstrap加载顺序优先于application)
+```yaml
+server:
+  port: 9991
+
+spring:
+  application:
+    name: mall-order
+  cloud:
+    # ncaos配置
+    nacos:
+      discovery:
+        server-addr: 8.152.0.119:8848 # Nacos服务注册中心地址
+      config:
+        server-addr: 8.152.0.119:8848 # Nacos配置中心地址
+        file-extension: yaml # 指定加载yaml后缀的配置文件
+        group: DEFAULT_GROUP # 指定服务所在的分组 TEST_GROUP or DEV_GROUP
+        # namespace: 70f309cd-313e-47ab-85ed-23e713b79a31 # 指定服务在哪个命名空间下面
+```
+
+3. 添加@RefreshScope注解打开配置信息动态刷新功能
+```java
+@RestController
+@RequestMapping("malloms/order")
+@RefreshScope
+public class OrderController {
+    @Value("${username}")
+    private String username;
+
+    @Value("${password}")
+    private String password;
+
+    //测试nacos配置中心
+    @GetMapping("/config")
+    public R queryConfig() {
+        return R.ok().put("username", username).put("password", password);
+    }
+}
+```
+
+4. 在nacos控制台中添加配置文件, 发布配置文件 (ps:配置中心中的配置信息优先于application.yaml中的配置信息)
+![img_20.png](img_20.png)
+
+5. 测试: 启动mall-order服务 访问 localhost:9991/malloms/order/config, 成功返回 `{"msg":"success","password":"123456","code":0,"username":"zhaoyu93"}`
+
+6. 为其他微服务新增bootstrap配置文件
+
+##### 3.24 命名空间和配置组
+可以通过dataId、group、namespace 三种方式进行配置文件隔离
+
+为每个微服务创建一个配置命名空间
+
+![img_21.png](img_21.png)
+
+然后通过配置分组来区分 dev, test, prod环境
+
+##### 3.25 配置拆分
+我们现在是将某个服务中的所有配置都写在了同一个配置文件中, 这样会导致配置文件过大, 难以维护, 配置拆分后, 配置文件就变小了, 也方便维护了
+
+mybatis相关配置:
+
+![img_22.png](img_22.png)
+
+datasource相关配置:
+
+![img_23.png](img_23.png)
+
+bootstrap.yaml配置:
+
+```yaml
+server:
+  port: 9991
+
+spring:
+  application:
+    name: mall-order
+  cloud:
+    # ncaos配置
+    nacos:
+      discovery:
+        server-addr: 8.152.0.119:8848 # Nacos服务注册中心地址
+      config:
+        server-addr: 8.152.0.119:8848 # Nacos配置中心地址
+        file-extension: yaml # 指定加载yaml后缀的配置文件
+        group: DEFAULT_GROUP # 指定服务所在的分组 eg: TEST_GROUP or DEV_GROUP
+        namespace: 56f80f04-c3b2-440a-a28b-4cb24426fd83 # 指定服务在哪个命名空间下面
+        ext-config[0]:date-id: mall-order-mybatis # 指定多个配置文件
+        ext-config[0].group: test
+        ext-config[0]:refresh: false
+
+        ext-config[1]:date-id: mall-order-datasource # 指定多个配置文件
+        ext-config[1].group: test
+        ext-config[1]:refresh: false
+```
+##### 3.26 Gateway核心概念介绍
+客户端不可能记下每一个微服务的地址, 因此我们需要网关来路由, 此外网关还可以实现限流、鉴权、统一日志记录等功能
+
+Spring Cloud Gateway 最重要的三个概念:
+- 路由(route): 路由是网关最基础的部分, 路由信息包括ID、目标URI、匹配条件、过滤器信息等
+- 断言(predicate): 路由条件, 例如请求方法、请求路径等
+- 过滤器(filter): 过滤器用于修改请求和响应的信息
+
+![img_24.png](img_24.png)
+
+> spring cloud gateway 为我们提供了一些现成的predicates(断言)和filters(过滤器)
+> 请求到网关 -> 断言 -> 过滤器 -> 路由到对应微服务 -> 过滤器 -> 返回结果
+
+![img_25.png](img_25.png)
+
+示例配置文件:
+```yaml
+server:
+  port: 9999
+
+spring:
+  main:
+    web-application-type: reactive
+  application:
+    name: cloud-gateway-service
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8848
+    gateway:
+      discovery:
+        locator:
+          enabled: true # 开启注册中心路由功能, 把网关服务注册到naocs中
+      routes:
+        # 路由1
+        - id: nacos-provider
+          uri: http://localhost:9001/nacos-provider # 匹配提供服务的路由地址
+          predicates:
+            - Path=/gateway/** # 断言, 路径相匹配则进行路由, 访问http://localhost:9001/nacos-provider/gateway/** 时匹配
+        # 路由2
+        - id: nacos-provider2
+          uri: http://localhost:9001/nacos-provider # 匹配提供服务的路由地址
+          predicates:
+            - Path=/route/** # 断言, 路径相匹配则进行路由
+```
+
+##### 3.27 Gateway网关服务搭建
+创建网关服务模块 mall-gateway(9995)
+
+1. pom.xml中添加对应的依赖:
+```xml
+        <!--nacos服务注册-->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+        </dependency>
+        <!--gateway依赖-->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-gateway</artifactId>
+            <version>${spring-cloud-gateway.version}</version>
+        </dependency>
+        <!--loadbalancer负载均衡组件, 必须加 否则gateway无法实现负载均衡-->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-loadbalancer</artifactId>
+            <version>3.0.1</version>
+        </dependency>
+```
+2. 完成配置
+
+3. 启动mall-gateway服务 测试网关服务路由规则
+- 网关服务成功注册到了nacos
+- 访问 localhost:9995/?url=baidu, 成功路由到百度; 访问 localhost:9995/?url=taobao, 成功路由到淘宝
 
 # 四、业务开发
 ## 1. 后台管理系统

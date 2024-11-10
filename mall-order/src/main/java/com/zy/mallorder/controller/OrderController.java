@@ -7,16 +7,13 @@ import java.util.Map;
 import com.zy.mall.common.utils.PageUtils;
 import com.zy.mall.common.utils.R;
 import com.zy.mallorder.entity.OrderEntity;
+import com.zy.mallorder.feign.ProductOpenFeignService;
 import com.zy.mallorder.service.OrderService;
 //import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
-
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
+import org.springframework.web.bind.annotation.*;
 
 
 /**
@@ -28,9 +25,32 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("malloms/order")
+@RefreshScope
 public class OrderController {
     @Autowired
     private OrderService orderService;
+
+    @Autowired
+    private ProductOpenFeignService productOpenFeignService;
+
+    //测试openFeign服务调用
+    @GetMapping("feign")
+    public R testFeign(){
+        return productOpenFeignService.queryAllBrand();
+    }
+
+
+    @Value("${username}")
+    private String username;
+
+    @Value("${password}")
+    private String password;
+
+    //测试nacos配置中心
+    @GetMapping("/config")
+    public R queryConfig(){
+        return R.ok().put("username", username).put("password", password);
+    }
 
     /**
      * 列表

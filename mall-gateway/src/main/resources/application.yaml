@@ -1,0 +1,28 @@
+server:
+  port: 9995
+
+
+# mysql
+spring:
+  # nacos配置
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 8.152.0.119:8848
+        username: nacos
+        password: nacos
+  application:
+    name: mall-gateway
+
+  jackson:
+    time-zone: GMT+8
+    date-format: yyyy-MM-dd HH:mm:ss
+  main:
+    allow-circular-references: true
+  web:
+    resources:
+      static-locations: classpath:/static/,classpath:/views/
+  profiles:
+    active: dev
+
+
