@@ -32,6 +32,7 @@
       <groupId>org.springframework.cloud</groupId>
       <artifactId>spring-cloud-starter-bootstrap</artifactId>
       <version>3.0.3</version>
+      <!--3.0.3-->
     </dependency>
     <!--nacos配置中心-->
     <dependency>

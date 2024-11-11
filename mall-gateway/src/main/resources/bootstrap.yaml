@@ -36,4 +36,3 @@ spring:
           predicates:
             - Query=url,taobao
 
-

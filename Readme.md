@@ -770,13 +770,79 @@ spring:
         </dependency>
 ```
 2. 完成配置
+bootstrap.yaml:
+
+```yaml
+server:
+  port: 9995
+
+spring:
+  application:
+    name: mall-gateway
+  cloud:
+    # ncaos配置
+    nacos:
+      discovery:
+        server-addr: 8.152.0.119:8848 # Nacos服务注册中心地址
+      config:
+        server-addr: 8.152.0.119:8848 # Nacos配置中心地址
+        file-extension: yaml # 指定加载yaml后缀的配置文件
+        group: DEFAULT_GROUP # 指定服务所在的分组 eg: TEST_GROUP or DEV_GROUP
+        # namespace: 56f80f04-c3b2-440a-a28b-4cb24426fd83 # 指定服务在哪个命名空间下面
+        #        ext-config[0]:date-id: mall-order-mybatis # 指定多个配置文件
+        #        ext-config[0].group: test
+        #        ext-config[0]:refresh: false
+        #
+        #        ext-config[1]:date-id: mall-order-datasource # 指定多个配置文件
+        #        ext-config[1].group: test
+        #        ext-config[1]:refresh: false
+
+    # 配置路由
+    gateway:
+      routes:
+        # 如果请求的url中包含baidu，则路由到百度
+        - id: route1
+          uri: http://www.baidu.com
+          predicates:
+            - Query=url,baidu
+        # 如果请求的url中包含taobao，则路由到淘宝
+        - id: route2
+          uri: http://www.taobao.com
+          predicates:
+            - Query=url,taobao
+
+
+```
 
 3. 启动mall-gateway服务 测试网关服务路由规则
 - 网关服务成功注册到了nacos
 - 访问 localhost:9995/?url=baidu, 成功路由到百度; 访问 localhost:9995/?url=taobao, 成功路由到淘宝
 
 # 四、业务开发
+前端模版服务: renren-ui (需要使用node v12.22.12 -> nvm use 12.22.12 否则报错)
+
+后端模版服务: renren-security
+
+### 0.1 业务开发方向拆解
+1. 维护基础数据 - 商品分类、商品品牌、商品规格、商品属性、商品SPU、商品SKU
+
+基于renren-security模版和renren-ui模版开发
+
 ## 1. 后台管理系统
+### 1.1 商品分类后台查询
+执行pms_category.sql 初始化商品分类数据
+
+> 接口测试记录参考postman
+
+mall-product -> CategoryController
+- 新增listTree接口, postman测试接口 通过
+
+> compareTo方法升降序是如何确定的: https://blog.csdn.net/weixin_45505313/article/details/130705913
+
+### 1.2 菜单维护
+
+
+
 ## 2. 基础业务
 ## 3. 商城业务
 

@@ -1,6 +1,7 @@
 package com.zy.mallproduct.controller;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 //import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -40,6 +41,19 @@ public class CategoryController {
         PageUtils page = categoryService.queryPage(params);
 
         return R.ok().put("page", page);
+    }
+
+    /**
+     * 查询所有的类别数据, 然后将数据封装为树形结构返回, 便于前端使用
+     */
+    @RequestMapping("/listTree")
+    //@RequiresPermissions("mallproduct:category:list")
+    public R listTree(@RequestParam Map<String, Object> params){
+        // 1. 查询所有的商品分类信息
+        // 2. 利用商品分类的父子关系 构造树形结构
+        List<CategoryEntity> categoryEntities = categoryService.queryPageTree(params);
+
+        return R.ok().put("categories", categoryEntities);
     }
 
 
