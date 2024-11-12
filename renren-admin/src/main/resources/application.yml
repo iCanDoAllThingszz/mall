@@ -5,7 +5,7 @@ server:
     threads:
       max: 1000
       min-spare: 30
-  port: 8080
+  port: 9998
   servlet:
     context-path: /renren-admin
     session:
