@@ -1,3 +1,7 @@
+create database mall_oms;
+
+use mall_oms;
+
 drop table if exists oms_order;
 
 drop table if exists oms_order_item;

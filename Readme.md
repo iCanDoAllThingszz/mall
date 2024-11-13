@@ -223,8 +223,10 @@ docker images
 基于mysql5.7镜像启动容器:
 ```shell
 # 基于mysql5.7镜像启动容器, 容器中端口为3306(第二个), 宿主机端口也为3306(第一个), 容器名称为mysql, -v 数据挂载信息(容器中哪些目录下的信息挂载到宿主机的哪些目录下) -e: 设置root账号的默认密码为root
-docker run -p 3306:3306 --name mysql -v /mydata/mysql/log:/var/log/mysql -v /mydata/mysql/data:/var/lib/mysql -v /mydata/mysql/conf:/etc/mysql/conf.d -e MYSQL_ROOT_PASSWORD=root -d mysql:5.7
+docker run -p 3306:3306 --name mysql -v /mydata/mysql/log:/var/log/mysql -v /mydata/mysql/data:/var/lib/mysql -v /mydata/mysql/conf:/etc/mysql/conf.d -e MYSQL_ROOT_PASSWORD=199741Zy1! -d mysql:5.7
 ```
+
+> 怎么修改mysql密码: https://blog.csdn.net/m0_37482190/article/details/133250569 (记一次狗黑客攻击)
 
 docker启动mysql容器时, 发生了问题 容器一启动就挂, 可以通过以下命令查看容器日志
 ```shell
@@ -485,7 +487,7 @@ docker pull nacos/nacos-server:latest
 启动nacos容器:
 ```shell
 # -d 后台运行模式 -e 设置环境变量 -v 设置挂载目录 --name 设置容器名称 -p 设置端口映射 nacos/nacos-server:1.4.2 镜像名称
-docker run -d -e MODE=standalone -v /mydata/nacos/conf:/home/nacos/conf --name nacos -p 8848:8848 nacos/nacos-server:latest
+docker run -d -e MODE=standalone -v /mydata/nacos/conf:/home/nacos/conf --name nacos -p 8848:8848 -p 8849:8849 -p 9848:9848 -p 9849:9849 nacos/nacos-server:latest
 ```
 
 然后需要:
@@ -840,6 +842,113 @@ mall-product -> CategoryController
 > compareTo方法升降序是如何确定的: https://blog.csdn.net/weixin_45505313/article/details/130705913
 
 ### 1.2 菜单维护
+1. 在renren-ui前端页面上新增【商品系统】一级菜单
+2. 在【商品系统】下新增【类别管理】菜单, 路由填写 mallproduct/category。ps: 菜单信息维护在renren-security的sys_menu表中
+3. 修改renren-ui, 新增mall/product/category.vue页面, 确保页面能够正确跳转, 页面内容参考renren-ui
+
+![img_26.png](img_26.png)
+
+### 1.3 数据展示 & renren-security 服务注册
+vue + element ui 实现数据展示
+
+element ui 组件: https://element.eleme.cn/#/zh-CN/component/installation
+
+模版服务中, 前端默认请求的url是人人模版后端: http://localhost:9998/renren-admin
+
+但是现在我们的服务架构如下图:
+
+![img_27.png](img_27.png)
+
+因此需要引入网关服务(mall-gateway 9995), 前端只请求网关服务, 网关服务完成后续服务的路由 (修改renren-ui的.env文件)
+
+修改renren-ui的.env文件, 将后端请求地址改为网关服务
+
+接下来我们需要让renren-security注册到nacos中, 这样网关才能将其路由到。
+
+##### renren-security服务注册
+1. renren-security使用的是较高版本的springboot 3.2.6, 因此我们要用spring cloud alibaba 2023.x 来与其兼容
+```xml
+<dependency>
+    <groupId>com.alibaba.cloud</groupId>
+    <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
+    <version>2023.0.1.0</version>
+</dependency>
+<dependency>
+    <groupId>com.alibaba.cloud</groupId>
+    <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+    <version>2023.0.1.0</version>
+</dependency>
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-bootstrap</artifactId>
+    <version>4.0.0</version>
+</dependency> 
+```
+2. 高版本的nacos默认使用grpc的方式和服务器通信(低版本用http), 因此我们需要把阿里云服务器以及docker中打开8848, 8849, 9848(8848+1000), 9849(8848+1001)端口
+
+docker 指定8848, 8849, 9848, 9849映射端口启动容器:
+```shell
+docker run -d -e MODE=standalone -v /mydata/nacos/conf:/home/nacos/conf --name nacos -p 8848:8848 -p 8849:8849 -p 9848:9848 -p 9849:9849 nacos/nacos-server:latest
+```
+
+### 1.4 网关路由
+通过配置网关服务的路由, 将前端请求路由到对应的服务
+
+mall-gateway -> bootstrap.yaml
+
+```yaml
+spring:
+  application:
+    name: mall-gateway
+  cloud:
+    # ncaos配置
+    nacos:
+      discovery:
+        server-addr: 8.152.0.119:8848 # Nacos服务注册中心地址
+      config:
+        server-addr: 8.152.0.119:8848 # Nacos配置中心地址
+        file-extension: yaml # 指定加载yaml后缀的配置文件
+        group: DEFAULT_GROUP # 指定服务所在的分组 eg: TEST_GROUP or DEV_GROUP
+
+    # 配置路由
+    gateway:
+      routes:
+        # renren-admin路由
+        - id: renren-admin
+          uri: lb://renren-admin
+          predicates:
+            - Path=/renren-admin/**
+```
+但是此时还是请求不到renren-admin服务, 因为mall-gateway服务没有配置允许跨域请求
+
+报错 `:8001/#/login:1 Access to XMLHttpRequest at 'http://localhost:9995/renren-admin/login' from origin 'http://172.18.141.186:8001' has been blocked by CORS policy: Response to preflight request doesn't pass access control check: No 'Access-Control-Allow-Origin' header is present on the requested resource.`
+
+> 跨域: 协议 or 域名 or 端口
+
+浏览器访问非同源服务器流程: <br/>
+
+![img_28.png](img_28.png)
+
+##### 解决跨域请求流程
+**问题原因:** 跨域根本原因是由同源策略引起的。所谓同源是指域名，协议，端口相同，当页面在执行一个脚本时会检查访问的资源是否同源，如果非同源，在请求数据的时候浏览器会在控制台报一个异常，提示拒绝访问。注意：跨域限制访问，其实是浏览器的限制。理解这一点很重要！！！
+
+**解决跨域问题的方法 - CORS方式解决跨域(常见, 仅修改服务端即可):**
+
+CORS 全称是"跨域资源共享"（Cross-origin resource sharing）。CORS需要浏览器和服务器同时支持，但是目前基本上浏览器都支持，所以我们只要保证服务器端服务器实现了 CORS 接口，就可以跨域通信
+
+实现方式：在响应头配置 Access-Control-Allow-Origin 字段以后,数据包发送给浏览器后，浏览器就会根据这里配置的白名单 “放行” 允许白名单的服务器对应的网页来用 ajax 跨域访问 。
+
+- Access-Control-Allow-Origin             允许请求的域
+- Access-Control-Allow-Methods            允许请求的方法
+- Access-Control-Allow-Headers            预检请求后，告知发送请求需要有的头部
+- Access-Control-Allow-Credentials        表示是否允许发送cookie，默认false；
+- Access-Control-Max-Age                  本次预检的有效期，单位：秒；
+
+> 在解决跨域问题的路途上, 我先尝试了WebMvcConfigurer, 发现无法生效, 更换为CorsWebFilter后生效
+
+删除renren-security的跨域配置, 否则报错`Access to XMLHttpRequest at 'http://localhost:9995/renren-admin/login' from origin 'http://172.18.141.186:8001&#39;  has been blocked by CORS policy: The 'Access-Control-Allow-Origin' header contains multiple values 'http://172.18.141.186:8001,  http://172.18.141.186:8001&#39;,  but only one is allowed.`
+
+这是因为有不止一个地方添加了响应头的Access-Control-Allow-Origin属性, Access-Control-Allow-Origin包含了多个值, 根据CORS规范, 这个响应头只能有一个值
 
 
 

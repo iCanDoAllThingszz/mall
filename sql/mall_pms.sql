@@ -1,3 +1,7 @@
+create database mall_pms;
+
+use mall_pms;
+
 drop table if exists pms_attr;
 
 drop table if exists pms_attr_attrgroup_relation;

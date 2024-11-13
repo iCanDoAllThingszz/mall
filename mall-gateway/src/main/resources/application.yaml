@@ -9,8 +9,6 @@ spring:
     nacos:
       discovery:
         server-addr: 8.152.0.119:8848
-        username: nacos
-        password: nacos
   application:
     name: mall-gateway
 

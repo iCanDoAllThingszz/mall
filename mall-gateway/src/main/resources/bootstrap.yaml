@@ -35,4 +35,10 @@ spring:
           uri: http://www.taobao.com
           predicates:
             - Query=url,taobao
-
+        # renren-admin路由
+        - id: renren-admin
+          uri: lb://renren-admin
+          predicates:
+            - Path=/renren-admin/**
+#          filters:
+#            - RewritePath=/renren-admin/(?<segment>.*),/renren-admin/$\{segment}
