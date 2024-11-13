@@ -35,10 +35,19 @@ spring:
           uri: http://www.taobao.com
           predicates:
             - Query=url,taobao
+
+        # 商品系统路由, 注意路由顺序 别让Path=/renren-admin/**把前面的路由给拦截了
+        - id: mall-product-route
+          uri: lb://mall-product
+          predicates:
+            - Path=/renren-admin/mallproduct/**
+          filters:
+            - StripPrefix=1 # 去掉路径上的前缀1层 renren-admin
         # renren-admin路由
-        - id: renren-admin
+        - id: renren-admin-route
           uri: lb://renren-admin
           predicates:
             - Path=/renren-admin/**
+
 #          filters:
 #            - RewritePath=/renren-admin/(?<segment>.*),/renren-admin/$\{segment}

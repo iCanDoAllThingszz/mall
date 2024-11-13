@@ -10,7 +10,7 @@ spring:
     driverClassName: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://8.152.0.119:3306/mall_pms?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Shanghai
     username: root
-    password: root
+    password: 199741Zy1!
     #oracle配置
     #    driverClassName: oracle.jdbc.OracleDriver
     #    url: jdbc:oracle:thin:@47.100.206.162:1521:xe
@@ -44,8 +44,6 @@ spring:
     nacos:
       discovery:
         server-addr: 8.152.0.119:8848
-        username: nacos
-        password: nacos
   application:
     name: mall-product
 

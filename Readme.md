@@ -950,6 +950,48 @@ CORS 全称是"跨域资源共享"（Cross-origin resource sharing）。CORS需�
 
 这是因为有不止一个地方添加了响应头的Access-Control-Allow-Origin属性, Access-Control-Allow-Origin包含了多个值, 根据CORS规范, 这个响应头只能有一个值
 
+### 1.5 查看类别数据
+配置网关的商品服务路由(**注意路由配置的顺序**):
+
+```yaml
+spring:
+  application:
+    name: mall-gateway
+  cloud:
+    # ncaos配置
+    nacos:
+      discovery:
+        server-addr: 8.152.0.119:8848 # Nacos服务注册中心地址
+      config:
+        server-addr: 8.152.0.119:8848 # Nacos配置中心地址
+        file-extension: yaml # 指定加载yaml后缀的配置文件
+        group: DEFAULT_GROUP # 指定服务所在的分组 eg: TEST_GROUP or DEV_GROUP
+        # namespace: 56f80f04-c3b2-440a-a28b-4cb24426fd83 # 指定服务在哪个命名空间下面
+
+    # 配置路由
+    gateway:
+      routes:
+        # 商品系统路由, 注意路由顺序 别让Path=/renren-admin/**把前面的路由给拦截了        
+        - id: mall-product-route
+          uri: lb://mall-product
+          predicates:
+            - Path=/renren-admin/mallproduct/**
+          filters:
+            - StripPrefix=1 # 去掉路径上的前缀1层 renren-admin
+        # renren-admin路由
+        - id: renren-admin-route
+          uri: lb://renren-admin
+          predicates:
+            - Path=/renren-admin/**
+```
+启动网关服务, renren-admin服务(后端基础功能), mall-product服务(商品服务)
+
+前端 -> 网关 -> 路由 -> mall-product / renren-admin 成功跑通
+
+修改renren-ui的category.vue页面, 使得返回的三级品类数据能够正确显示:
+
+![img_29.png](img_29.png)
+
 
 
 ## 2. 基础业务
