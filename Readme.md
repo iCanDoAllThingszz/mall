@@ -821,7 +821,7 @@ spring:
 - 访问 localhost:9995/?url=baidu, 成功路由到百度; 访问 localhost:9995/?url=taobao, 成功路由到淘宝
 
 # 四、业务开发
-前端模版服务: renren-ui (需要使用node v12.22.12 -> nvm use 12.22.12 否则报错)
+前端模版服务: renren-ui (需要使用node v16.0.0 -> nvm use 16.0.0 否则报错)
 
 后端模版服务: renren-security
 
@@ -991,6 +991,26 @@ spring:
 修改renren-ui的category.vue页面, 使得返回的三级品类数据能够正确显示:
 
 ![img_29.png](img_29.png)
+
+### 1.6 删除类别数据
+1. 修改renren-ui 的category.vue页面, 新增: 添加删除按钮(附带展示逻辑); 新增复选框
+
+2. CategoryController -> delete 批量删除接口, 使用Postman测试/mallproduct/category/delete接口 <br/>
+为CategoryEntity类新增逻辑删除判断字段isDeleted, 默认值为0, 删除时更新为1, 同时为pms_category表新增is_Deleted字段
+
+3. 修改 CategoryController -> delete 接口逻辑
+
+4. 修改renren-ui, 新增点击 添加/删除按钮后的逻辑 **element-ui组件库只兼容vue2, 我们使用的是vue3, 所以需要安装element-plus 为了使用其中的elmessagebox, elmessage组件; node版本适用v16.0.0**
+
+5. 完成类别删除功能
+
+### 1.7 新增类别信息
+
+> element-plus组件库地址: https://element-plus.org/zh-CN
+
+1. 修改renren-ui 的category.vue页面, 新增: 点击添加按钮 跳出添加类目详情对话框(el-dialog), 添加完成后调用 mallproduct/category/save接口保存数据
+
+2. 完成类别新增功能
 
 
 

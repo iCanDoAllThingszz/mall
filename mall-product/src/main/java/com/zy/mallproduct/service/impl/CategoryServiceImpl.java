@@ -82,4 +82,16 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         return collect;
     }
 
+    /**
+     * @description 根据catIds删除类别信息
+     * @param catIds 目录id主键
+     * */
+    public void removeCategoryByIds(List<Long> catIds) {
+        // 1.检查类别数据是否在其他业务中使用
+        // todo 其他服务就绪后补充此步骤
+
+        // 2.逻辑删除 注意不要使用 this.removeCategoryByIds(catIds), 否则自己调自己, 事务失效
+        categoryDao.deleteBatchIds(catIds);
+    }
+
 }
