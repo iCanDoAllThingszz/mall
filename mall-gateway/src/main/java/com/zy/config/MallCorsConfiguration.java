@@ -20,7 +20,7 @@ import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
  */
 
 @Configuration
-public class MllCorsConfiguration {
+public class MallCorsConfiguration {
 
     @Bean
     public CorsWebFilter corsWebFilter() {
