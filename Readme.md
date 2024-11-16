@@ -831,6 +831,9 @@ spring:
 基于renren-security模版和renren-ui模版开发
 
 ## 1. 后台管理系统
+
+## 1. 三级类目操作
+
 ### 1.1 商品分类后台查询
 执行pms_category.sql 初始化商品分类数据
 
@@ -1012,6 +1015,10 @@ spring:
 
 2. 完成类别新增功能
 
+### 1.8 更新类别
+1. 修改renren-ui 的category.vue页面, 新增: 点击编辑按钮 跳出编辑类目详情对话框(el-dialog), 编辑完成后调用 mallproduct/category/update接口更新数据
+
+2. 完成类别编辑功能
 
 
 ## 2. 基础业务
