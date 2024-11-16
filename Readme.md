@@ -1029,9 +1029,12 @@ spring:
 
 3. 完成拖拽功能
 
+4. 修改renren-ui 的category.vue页面, 新增switch控件, 控制拖拽功能开关
 
+### 1.10 批量删除类目数据
+1. 修改renren-ui 的category.vue页面, 新增: 批量删除按钮, 批量删除后调用/mallproduct/category/delete接口批量删除数据
 
-
+2. 完成批量删除功能
 
 ## 2. 基础业务
 ## 3. 商城业务
