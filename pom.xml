@@ -24,6 +24,10 @@
         <module>renren-generator</module>
         <module>mall-coupon</module>
         <module>mall-gateway</module>
+        <module>mall-product</module>
+        <module>mall-member</module>
+        <module>mall-order</module>
+        <module>mall-ware</module>
     </modules>
 
     <properties>
