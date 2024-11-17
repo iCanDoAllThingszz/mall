@@ -14,3 +14,4 @@ spring:
         file-extension: yaml # 指定加载yaml后缀的配置文件
         group: DEFAULT_GROUP # 指定服务所在的分组 TEST_GROUP or DEV_GROUP
         # namespace: 70f309cd-313e-47ab-85ed-23e713b79a31 # 指定服务在哪个命名空间
+

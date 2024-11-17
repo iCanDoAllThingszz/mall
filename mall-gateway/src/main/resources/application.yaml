@@ -1,0 +1,32 @@
+server:
+  port: 9995
+
+spring:
+  # nacos配置
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 8.152.0.119:8848
+  application:
+    name: mall-gateway
+
+# mysql 这里因为网关服务继承了mybatis依赖, 所以随便给他配置一个数据库连接信息 避免启动报错, 实际不使用这个连接
+  datasource:
+    druid:
+      # MySQL
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      url: jdbc:mysql://8.152.0.119:3306/mall_sms?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&nullCatalogMeansCurrent=true
+      username: root
+      password: 199741Zy1!
+
+  jackson:
+    time-zone: GMT+8
+    date-format: yyyy-MM-dd HH:mm:ss
+  main:
+    allow-circular-references: true
+  web:
+    resources:
+      static-locations: classpath:/static/,classpath:/views/
+  profiles:
+    active: dev
+
