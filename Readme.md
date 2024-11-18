@@ -1047,6 +1047,63 @@ spring:
 
 3. 实现品牌管理crud基本功能
 
+### 2.2 品牌管理 - 显示状态优化
+
+### 2.3 阿里云OSS服务开通和使用
+1. 我们将图片存放在阿里云OSS服务器上, 方便各个微服务进行访问。 阿里云oss控制台: https://oss.console.aliyun.com/overview
+
+
+
+> oss学习路径: https://help.aliyun.com/zh/oss/
+
+> 阿里云oss服务 api文档: https://help.aliyun.com/zh/oss/developer-reference/description?spm=a2c4g.11186623.help-menu-31815.d_3_2_0.7ec3b930QfGlyk
+
+相关术语介绍:
+
+![img_30.png](img_30.png)
+
+2. 新建 `mall-bucket-zy` bucket
+
+> 配置环境变量secret-id,secret-key等, 详情见阿里云oss java sdk 【快速入门】 https://help.aliyun.com/zh/oss/developer-reference/getting-started?spm=a2c4g.11186623.help-menu-31815.d_3_3_0_4.72a15c719jlR9V&scm=20140722.H_32011._.OR_help-V_1#f033b3702421e
+
+3. 使用阿里云oss api上传文件 mall-product -> MallProductApplicationTests -> testUploadFile() `参考[阿里云API文档](https://help.aliyun.com/zh/oss/developer-reference/list-of-operations-by-function?spm=a2c4g.11186623.help-menu-31815.d_3_2_1.6f2354b5wgWyLJ)`
+
+参考阿里云oss java sdk文档, 导入依赖:
+
+```xml
+        <!--阿里云oss sdk-->
+        <dependency>
+            <groupId>com.aliyun.oss</groupId>
+            <artifactId>aliyun-sdk-oss</artifactId>
+            <version>3.17.4</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+            <version>2.3.1</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.activation</groupId>
+            <artifactId>activation</artifactId>
+            <version>1.1.1</version>
+        </dependency>
+        <!-- no more than 2.3.3-->
+        <dependency>
+            <groupId>org.glassfish.jaxb</groupId>
+            <artifactId>jaxb-runtime</artifactId>
+            <version>2.3.3</version>
+        </dependency>
+```
+
+参考阿里云oss java sdk 上传文件 -> 上传文件流demo代码, 修改testUploadFile()方法 `注意需要设置access-key-id和access-key-secret环境变量`
+
+上传成功:
+
+![img_31.png](img_31.png)
+
+### 2.4 SpringCloud Alibaba oss 操作
+
+
 ## 2. 基础业务
 ## 3. 商城业务
 
