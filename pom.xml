@@ -28,6 +28,7 @@
         <module>mall-member</module>
         <module>mall-order</module>
         <module>mall-ware</module>
+        <module>mall-thrid-party</module>
     </modules>
 
     <properties>

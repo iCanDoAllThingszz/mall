@@ -1161,7 +1161,7 @@ public class Test{
 ![img_31.png](img_31.png)
 
 ### 2.4 SpringCloud Alibaba OSS 操作
-alibaba的Springboot starter好像有点问题, 不一定能支持到springboot 3.2这么高的版本, 还是使用上述的方法进行springboot和oss的整合把
+alibaba的Springboot starter好像有点问题, 不一定能支持到springboot 3.2这么高的版本, 还是使用上述的方法完成springboot和oss的整合吧
 
 可以参考: [【案例实战】SpringBoot整合阿里云文件上传OSS](https://developer.aliyun.com/article/1227235)
 
@@ -1177,12 +1177,19 @@ alibaba的Springboot starter好像有点问题, 不一定能支持到springboot 
 
 ![img_33.png](img_33.png)
 
-3. 浏览器 -> 商品服务 (获得图片的防伪签名)
+3. 浏览器 -> 商品服务 (获得图片的阿里云防伪签名)
    浏览器 -> oss服务器 (根据防伪签名把图片上传到oss服务器)
 
-![img_34.png](img_34.png)
+既提高了效率, 有保证了安全
 
+![img_36.png](img_36.png)
 
+### 2.6 third-party服务创建
+创建mall-third-party服务 用于处理第三方服务, 比如阿里云oss防伪签名获取, 短信发送服务等第三方服务
+
+测试Springboot整合阿里云oss操作 -> MallThridPartyApplicationTests :: aliyunOssUploadFile
+
+### 2.7 服务端签名服务
 
 
 
