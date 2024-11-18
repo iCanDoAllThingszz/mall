@@ -64,8 +64,8 @@ mybatis-plus:
 # 阿里云oss配置信息
 aliyun:
   oss:
-    end-point: input your endpoint
-    access-key-id: input your access-key-id
-    access-key-secret: input your access-key-secret
-    bucket_name: input your bucket_name
+    end-point: https://oss-cn-beijing.aliyuncs.com
+    access-key-id: LTAI5tGb8fGPsoTWj5CEpzbJ
+    access-key-secret: ydMTNXYXExf61e7iJfuJEPIZHVLU6v
+    bucket_name: mall-bucket-zy
 
