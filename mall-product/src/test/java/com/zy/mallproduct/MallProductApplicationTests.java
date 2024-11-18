@@ -1,5 +1,8 @@
 package com.zy.mallproduct;
 
+
+
+
 import com.aliyun.oss.*;
 import com.aliyun.oss.common.auth.CredentialsProviderFactory;
 import com.aliyun.oss.common.auth.EnvironmentVariableCredentialsProvider;

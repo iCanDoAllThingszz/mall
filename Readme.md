@@ -317,7 +317,7 @@ docker update --restart=always <container_id>
 idea连接redis, ok
 
 ##### 3.5 本地开发环境准备
-1. jdk 1.8
+1. jdk 17
 2. idea + web storm
 3. git
 
@@ -1160,7 +1160,30 @@ public class Test{
 
 ![img_31.png](img_31.png)
 
-### 2.4 SpringCloud Alibaba oss 操作
+### 2.4 SpringCloud Alibaba OSS 操作
+alibaba的Springboot starter好像有点问题, 不一定能支持到springboot 3.2这么高的版本, 还是使用上述的方法进行springboot和oss的整合把
+
+可以参考: [【案例实战】SpringBoot整合阿里云文件上传OSS](https://developer.aliyun.com/article/1227235)
+
+### 2.5 图片上传的各种方式介绍
+1. 浏览器 -> 商品服务 -> oss服务器(大文件上传时, 后端服务压力大, 影响正常的业务流程)
+
+要做两次大文件上传操作
+
+![img_32.png](img_32.png)
+
+2. 浏览器 -> 商品服务
+   浏览器 -> oss服务器 (前端上传图片到oss, 把图片在oss上的地址传给后端; access-key, access-secret需要存到前端 不安全)
+
+![img_33.png](img_33.png)
+
+3. 浏览器 -> 商品服务 (获得图片的防伪签名)
+   浏览器 -> oss服务器 (根据防伪签名把图片上传到oss服务器)
+
+![img_34.png](img_34.png)
+
+
+
 
 
 ## 2. 基础业务
