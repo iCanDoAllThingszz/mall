@@ -61,11 +61,5 @@ spring:
 mybatis-plus:
   mapper-locations: classpath:mapper/**/*.xml
 
-# 阿里云oss配置信息
-aliyun:
-  oss:
-    end-point: https://oss-cn-beijing.aliyuncs.com
-    access-key-id: LTAI5tGb8fGPsoTWj5CEpzbJ
-    access-key-secret: ydMTNXYXExf61e7iJfuJEPIZHVLU6v
-    bucket_name: mall-bucket-zy
+
 
