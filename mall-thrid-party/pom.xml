@@ -53,6 +53,13 @@
             <artifactId>jaxb-runtime</artifactId>
             <version>2.3.3</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/com.aliyun/sts20150401 -->
+        <!--sts-->
+        <dependency>
+            <groupId>com.aliyun</groupId>
+            <artifactId>sts20150401</artifactId>
+            <version>1.1.4</version>
+        </dependency>
 
         <!--openfeign-->
         <dependency>

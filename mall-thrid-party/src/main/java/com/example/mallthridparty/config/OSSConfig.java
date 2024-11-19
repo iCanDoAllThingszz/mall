@@ -31,4 +31,6 @@ public class OSSConfig {
 
     private String bucketName;
 
+    private String roleArn;
+
 }

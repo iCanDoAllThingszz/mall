@@ -1190,7 +1190,66 @@ alibaba的Springboot starter好像有点问题, 不一定能支持到springboot 
 测试Springboot整合阿里云oss操作 -> MallThridPartyApplicationTests :: aliyunOssUploadFile
 
 ### 2.7 服务端签名服务
+服务端生成签名参考: [阿里云oss web端直传实践 - 服务端签名直传](https://help.aliyun.com/zh/oss/use-cases/obtain-signature-information-from-the-server-and-upload-data-to-oss?scm=20140722.S_help%40%40文档%40%4031926.S_BB1%40bl%2BRQW%40ag0%2BBB2%40ag0%2Bhot%2Bos0.ID_31926-RL_签名-LOC_doc%7EUND%7Eab-OR_ser-V_4-P0_0&spm=a2c4g.11186623.0.i4)
 
+![img_37.png](img_37.png)
+
+整体步骤:
+1. 配置oss服务的跨域规则
+2. 配置用户权限, 获取access-key和access-secret, 并将其设置到服务段代码的环境变量中
+3. 服务器接收到Web端发送的用户上传文件的请求后，使用自己的长期凭证（accessKeyId和accessKeySecret）向阿里云STS请求一个临时授权凭证，这个临时凭证将授权Web端在限定的时间内对特定资源进行操作。临时访问凭证的使用应限制在最小必要范围内。
+4. 服务端构建上传策略, 您可以根据您的业务需求在请求中构建请求策略，这些策略可能包括但不限于文件的最大尺寸、文件存储的具体位置以及请求的有效期限等。
+5. 服务端计算签名, 在Web端能够发起上传请求之前，服务器需要基于前面定义的策略生成一个数字签名。这个签名用于验证请求的合法性和完整性。您可以通过控制台直接生成签名，也可以参考以下内容在您的代码中实现。
+6. 服务端将所有必要的信息（包括但不限于签名、STS Token、Policy等）组织成适合HTTP POST请求的数据格式，以便于Web端使用这些数据构建上传请求。
+
+新增OSSController以及getOssToken接口, 接口测试见postman
+
+配置网关路由:
+```yaml
+server:
+  port: 9995
+
+spring:
+  application:
+    name: mall-gateway
+  cloud:
+    # ncaos配置
+    nacos:
+      discovery:
+        server-addr: 8.152.0.119:8848 # Nacos服务注册中心地址
+      config:
+        server-addr: 8.152.0.119:8848 # Nacos配置中心地址
+        file-extension: yaml # 指定加载yaml后缀的配置文件
+        group: DEFAULT_GROUP # 指定服务所在的分组 eg: TEST_GROUP or DEV_GROUP
+
+    # 配置路由
+    gateway:
+      routes:
+        # 商品系统路由, 注意路由顺序 别让Path=/renren-admin/**把前面的路由给拦截了
+        - id: mall-product-route
+          uri: lb://mall-product
+          predicates:
+            - Path=/renren-admin/mallproduct/**
+          filters:
+            - StripPrefix=1 # 去掉路径上的前缀1层 renren-admin
+        # 第三方服务路由
+        - id: mall-third-party-route
+          uri: lb://mall-third-party
+          predicates:
+            - Path=/renren-admin/oss/**
+          filters:
+            - StripPrefix=1 # 去掉路径上的前缀1层 renren-admin
+        # renren-admin路由
+        - id: renren-admin-route
+          uri: lb://renren-admin
+          predicates:
+            - Path=/renren-admin/**
+
+#          filters:
+#            - RewritePath=/renren-admin/(?<segment>.*),/renren-admin/$\{segment}
+```
+
+### 2.8 上传图片功能实现
 
 
 ## 2. 基础业务

@@ -61,5 +61,5 @@ spring:
 mybatis-plus:
   mapper-locations: classpath:mapper/**/*.xml
 
-
+# 阿里云oss配置信息, 注意上传github时不要上传此配置!!!
 
