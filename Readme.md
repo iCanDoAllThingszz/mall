@@ -1250,6 +1250,19 @@ spring:
 ```
 
 ### 2.8 上传图片功能实现
+整体流程:
+1. 阿里云OSS配置跨域
+2. 后端服务签名实现(这里没有用角色扮演, 直接用子账号zhaoyu93生成的签名) 实现细节见 OssServiceImpl#getOssToken
+3. 前端向阿里云oss提交表单, 携带签名信息, 具体见 singleUpload.vue
+
+### 2.9 添加和修改功能完善
+配置品牌管理页面显示我们上传到阿里云oss的图片, 需要打开bucket的权限, 并且不要开启阻止公共访问 否则无法访问 参考:https://developer.aliyun.com/article/1052776
+
+代码参考 brand.vue
+
+![img_38.png](img_38.png)
+
+![img_39.png](img_39.png)
 
 
 
