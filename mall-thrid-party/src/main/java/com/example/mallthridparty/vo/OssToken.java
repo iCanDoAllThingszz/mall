@@ -25,7 +25,7 @@ public class OssToken {
 
     private String host;
 
-    private String ossAccessKeyId;
+    private String accessid;
 
     private String stsToken;
 
