@@ -13,12 +13,18 @@ import com.aliyun.oss.model.PutObjectResult;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.zy.mallproduct.dto.BrandDTO;
+import com.zy.mallproduct.dto.CategoryDTO;
 import com.zy.mallproduct.entity.BrandEntity;
 import com.zy.mallproduct.service.BrandService;
+import com.zy.mallproduct.service.CategoryService;
 import io.renren.common.page.PageData;
 import org.junit.jupiter.api.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
@@ -31,6 +37,13 @@ import java.util.List;
 class MallProductApplicationTests {
     @Autowired
     private BrandService brandService;
+
+    //容器中只能有一种类型的bean, 因此Spring 的测试上下文会替换掉所有 BrandService 类型的 bean，包括通过 @Autowired 注入的实例，用这个 mock 对象替代
+    @MockBean
+    private BrandService brandServiceMock;
+
+    @Autowired
+    private CategoryService categoryService;
 
     @Test
     void contextLoads() {
@@ -103,6 +116,19 @@ class MallProductApplicationTests {
     @Test
     public void test2(){
         System.out.println(StringUtils.trim(System.getenv("OSS_ACCESS_KEY_ID")));
+    }
+
+
+    @Test
+    public void mockitoTest(){
+        BrandDTO brandDTO = new BrandDTO();
+        brandDTO.setName("mock");
+
+        brandServiceMock.save(brandDTO);
+
+        CategoryDTO categoryDTO = new CategoryDTO();
+        categoryDTO.setName("true");
+        categoryService.save(categoryDTO);
     }
 
 }

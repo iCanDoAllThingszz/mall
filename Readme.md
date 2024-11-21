@@ -1264,6 +1264,12 @@ spring:
 
 ![img_39.png](img_39.png)
 
+### 2.10 前端表单数据校验
+前端校验: 对前端添加修改品牌的dialog进行表单校验(主要使用表单的rules属性完成), 参考 brand-add-or-update.vue
+
+### 2.11 JR303校验实现
+后端校验: 
+
 
 
 
