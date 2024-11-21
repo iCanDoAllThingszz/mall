@@ -1267,8 +1267,105 @@ spring:
 ### 2.10 前端表单数据校验
 前端校验: 对前端添加修改品牌的dialog进行表单校验(主要使用表单的rules属性完成), 参考 brand-add-or-update.vue
 
-### 2.11 JR303校验实现
-后端校验: 
+### 2.11 JSR-303校验实现
+后端校验(前端校验不能覆盖所有情况 eg:直接请求接口就可以跳过前端校验): 利用aop的思想 + JSR303规范 完成校验
+
+JSR是Java Specification Requests的缩写, 意思是Java规范提案, 是指向JCP(Java Community Process)提出新增一个标准化技术规范的正式请求, 任何人都可以提交JSR 以向Java平台增添新的API和服务。JSR已成为Java的一个重要标准。
+
+JSR-303是Java EE 6的一项子规范, 叫做Bean Validation。Hibernate Validator是JSR-303的参考实现, Hibernate Validator提供了JSR-303规范中所有内置Constraint的实现, 除此以外还有一些附加的Constraint。
+
+添加 `spring-boot-starter-validation`依赖, 使用相关注解完成校验, 在实体类上添加校验注解
+- @NotNull: 用于校验字段是否为null
+- @NotBlank: 用于校验字段是否为null或只包含空格
+- @NotEmpty: 用于校验字段是否为null或字符串长度/集合大小为0
+
+在函数行参的位置加@Valid注解, 开启校验 eg (通过BindingResult对象获取校验的结果信息):
+
+```java
+@PutMapping
+@Operation(summary = "修改")
+@LogOperation("修改")
+//@RequiresPermissions("mallproduct:brand:update")
+public Result update(@Valid @RequestBody BrandDTO dto, BindingResult result){
+        //效验数据
+        ValidatorUtils.validateEntity(dto, UpdateGroup.class, DefaultGroup.class);
+
+        //JSR303校验出了非法字段
+        if (result.hasErrors()) {
+        return new Result().error(400, result.getAllErrors().stream().map(String::valueOf).collect(Collectors.joining(",")));
+        }
+
+        brandService.update(dto);
+
+        return new Result();
+        }
+```
+
+1. 给BrandDTO添加校验注解
+```java
+/**
+ * 品牌
+ *
+ * @author zhaoyu93 zhaoyu93@meituan.com
+ * @since 1.0.0 2024-11-17
+ */
+@Data
+@Schema(name = "品牌")
+public class BrandDTO implements Serializable {
+   private static final long serialVersionUID = 1L;
+
+   @SchemaProperty(name = "品牌id")
+   private Long brandId;
+
+   @SchemaProperty(name = "品牌名")
+   @NotEmpty(message = "品牌名称字段不能为空")
+   private String name;
+
+   @SchemaProperty(name = "品牌logo地址")
+   @URL(message = "logo的格式必须是url合法地址")
+   @NotEmpty(message = "logo字段不能为空")
+   private String logo;
+
+   @SchemaProperty(name = "介绍")
+   private String descript;
+
+   @SchemaProperty(name = "显示状态[0-不显示；1-显示]")
+   private Integer showStatus = 1;
+
+   @SchemaProperty(name = "检索首字母")
+   @Pattern(regexp = "^[a-zA-Z]$", message = "检索首字母必须是单个字母")
+   @NotEmpty(message = "检索首字母字段不能为空")
+   private String firstLetter;
+
+   @SchemaProperty(name = "排序")
+   @Min(value = 0, message = "排序字段不能小于0")
+   @Max(value = 9999, message = "排序字段不能大于9999")
+   //@Pattern(regexp = "^[0-9]+$", message = "排序字段必须是数字") 这里不能用@Pattern注解, @Pattern注解只能用于字符串校验 用到整型就报错
+   private Integer sort = 0;
+}
+
+```
+2. 给BrandController的update方法的入参dto加@Valid注解
+3. 测试update接口, 不满足校验条件 则报错 400 Bad Request :
+
+![img_41.png](img_41.png)
+
+`控制台日志: 2024-11-21T22:35:33.352+08:00  WARN 96577 --- [mall-product] [nio-9990-exec-2] .w.s.m.s.DefaultHandlerExceptionResolver : Resolved [org.springframework.web.bind.MethodArgumentNotValidException: Validation failed for argument [0] in public io.renren.common.utils.Result com.zy.mallproduct.controller.BrandController.update(com.zy.mallproduct.dto.BrandDTO): [Field error in object 'brandDTO' on field 'name': rejected value []; codes [NotEmpty.brandDTO.name,NotEmpty.name,NotEmpty.java.lang.String,NotEmpty]; arguments [org.springframework.context.support.DefaultMessageSourceResolvable: codes [brandDTO.name,name]; arguments []; default message [name]]; default message [品牌名称字段不能为空]] ]`
+
+> [git命令大全](https://blog.csdn.net/qq_43727392/article/details/137741796)
+
+
+```markdown
+在 Spring MVC 中，当你在控制器（Controller）的方法参数中使用 @Valid 或 @Validated 注解来启用 Spring 的验证机制时，可以紧跟着在方法参数中添加一个 BindingResult 参数。Spring MVC 会自动检测到这个参数，并将验证过程中产生的错误填充到这个 BindingResult 对象中。
+这是如何做到的呢？主要是通过 Spring MVC 的参数解析机制实现的。当一个 HTTP 请求到达 Spring MVC 控制器的一个处理方法时，Spring 的 DispatcherServlet 会根据配置的 HandlerMapping 找到对应的处理器（Controller），然后根据 HandlerAdapter 的实现类来调用具体的方法。
+在这个过程中，方法的参数需要被解析和填充。Spring MVC 有一套参数解析的策略，这套策略由一系列的 HandlerMethodArgumentResolver 组成，每个 Resolver 负责解析一种类型的参数。对于 @Valid 或 @Validated 注解和紧随其后的 BindingResult 参数，Spring MVC 使用特定的 Resolver 来处理它们。
+当 @Valid 或 @Validated 注解的参数被解析时，Spring MVC 会调用配置的验证器（Validator）对参数对象进行验证。验证的结果，无论是成功还是失败，都会被封装到一个 BindingResult 对象中。如果方法参数中紧跟着有一个 BindingResult 类型的参数，Spring MVC 就会将这个验证结果对象传递给它。
+这样，你就可以在方法体内通过检查 BindingResult 对象来判断验证是否通过，以及在验证失败时获取失败的详细信息。
+这个机制使得在控制器方法中处理验证结果变得非常方便。你可以根据验证结果来决定是否继续执行方法的剩余部分，或者是直接返回一个错误响应给客户端。
+示例代码中，BindingResult result 参数就是这样注入的。通过检查 result.hasErrors() 来判断是否有验证错误，如果有，可以进一步处理这些错误，例如，将错误信息返回给客户端。
+```
+
+### 2.12 统一异常处理
 
 
 

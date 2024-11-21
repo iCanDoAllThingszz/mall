@@ -16,14 +16,17 @@ import com.zy.mallproduct.service.BrandService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 
 /**
@@ -67,7 +70,7 @@ public class BrandController {
     @Operation(summary = "保存")
     @LogOperation("保存")
     //@RequiresPermissions("mallproduct:brand:save")
-    public Result save(@RequestBody BrandDTO dto){
+    public Result save(@Valid @RequestBody BrandDTO dto){
         //效验数据
         ValidatorUtils.validateEntity(dto, AddGroup.class, DefaultGroup.class);
 
@@ -80,9 +83,14 @@ public class BrandController {
     @Operation(summary = "修改")
     @LogOperation("修改")
     //@RequiresPermissions("mallproduct:brand:update")
-    public Result update(@RequestBody BrandDTO dto){
+    public Result update(@Valid @RequestBody BrandDTO dto, BindingResult result){
         //效验数据
         ValidatorUtils.validateEntity(dto, UpdateGroup.class, DefaultGroup.class);
+
+        //JSR303校验出了非法字段
+        if (result.hasErrors()) {
+            return new Result().error(400, result.getAllErrors().stream().map(String::valueOf).collect(Collectors.joining(",")));
+        }
 
         brandService.update(dto);
 

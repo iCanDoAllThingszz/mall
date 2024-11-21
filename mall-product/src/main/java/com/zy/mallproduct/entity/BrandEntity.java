@@ -3,6 +3,8 @@ package com.zy.mallproduct.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.util.Date;
@@ -23,10 +25,15 @@ public class BrandEntity {
 
     @TableId(type = IdType.AUTO)
 	private Long brandId;
+
     /**
      * 品牌名
      */
+    //@NotEmpty 不能为null/""
+    //@NotBlank 不能为null/""/" " (必须包含一个非空格字符)
+    @NotNull // 不能为null
 	private String name;
+
     /**
      * 品牌logo地址
      */
