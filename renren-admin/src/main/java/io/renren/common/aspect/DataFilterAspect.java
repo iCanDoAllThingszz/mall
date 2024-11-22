@@ -67,7 +67,7 @@ public class DataFilterAspect {
             return;
         }
 
-        throw new RenException(ErrorCode.DATA_SCOPE_PARAMS_ERROR);
+        throw new RenException(ErrorCode.DATA_SCOPE_PARAMS_ERROR.getCode());
     }
 
     /**

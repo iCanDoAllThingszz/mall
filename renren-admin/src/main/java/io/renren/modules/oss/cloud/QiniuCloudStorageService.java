@@ -48,10 +48,10 @@ public class QiniuCloudStorageService extends AbstractCloudStorageService {
         try {
             Response res = uploadManager.put(data, path, token);
             if (!res.isOK()) {
-                throw new RenException(ErrorCode.OSS_UPLOAD_FILE_ERROR, res.toString());
+                throw new RenException(ErrorCode.OSS_UPLOAD_FILE_ERROR.getCode(), res.toString());
             }
         } catch (Exception e) {
-            throw new RenException(ErrorCode.OSS_UPLOAD_FILE_ERROR, e, "");
+            throw new RenException(ErrorCode.OSS_UPLOAD_FILE_ERROR.getCode(), e, "");
         }
 
         return config.getQiniuDomain() + "/" + path;
@@ -63,7 +63,7 @@ public class QiniuCloudStorageService extends AbstractCloudStorageService {
             byte[] data = IOUtils.toByteArray(inputStream);
             return this.upload(data, path);
         } catch (IOException e) {
-            throw new RenException(ErrorCode.OSS_UPLOAD_FILE_ERROR, e, "");
+            throw new RenException(ErrorCode.OSS_UPLOAD_FILE_ERROR.getCode(), e, "");
         }
     }
 

@@ -104,7 +104,7 @@ public class SysUserController {
 
         //原密码不正确
         if (!PasswordUtils.matches(dto.getPassword(), user.getPassword())) {
-            return new Result().error(ErrorCode.PASSWORD_ERROR);
+            return new Result().error(ErrorCode.PASSWORD_ERROR.getCode());
         }
 
         sysUserService.updatePassword(user.getId(), dto.getNewPassword());

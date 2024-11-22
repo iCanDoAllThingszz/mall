@@ -65,10 +65,10 @@ public class QcloudCloudStorageService extends AbstractCloudStorageService {
             
             client.shutdown();
             if(result.getETag() == null){
-                throw new RenException(ErrorCode.OSS_UPLOAD_FILE_ERROR, "");
+                throw new RenException(ErrorCode.OSS_UPLOAD_FILE_ERROR.getCode(), "");
             }
         } catch (IOException e) {
-            throw new RenException(ErrorCode.OSS_UPLOAD_FILE_ERROR, e, "");
+            throw new RenException(ErrorCode.OSS_UPLOAD_FILE_ERROR.getCode(), e, "");
         }
 
         return config.getQcloudDomain() + "/" + path;

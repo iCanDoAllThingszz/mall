@@ -27,12 +27,12 @@ import java.util.Map;
 public class AssertUtils {
 
     public static void isBlank(String str, String... params) {
-        isBlank(str, ErrorCode.NOT_NULL, params);
+        isBlank(str, ErrorCode.NOT_NULL.getCode(), params);
     }
 
     public static void isBlank(String str, Integer code, String... params) {
         if(code == null){
-            throw new RenException(ErrorCode.NOT_NULL, "code");
+            throw new RenException(ErrorCode.NOT_NULL.getCode(), "code");
         }
 
         if (StrUtil.isBlank(str)) {
@@ -41,12 +41,12 @@ public class AssertUtils {
     }
 
     public static void isNull(Object object, String... params) {
-        isNull(object, ErrorCode.NOT_NULL, params);
+        isNull(object, ErrorCode.NOT_NULL.getCode(), params);
     }
 
     public static void isNull(Object object, Integer code, String... params) {
         if(code == null){
-            throw new RenException(ErrorCode.NOT_NULL, "code");
+            throw new RenException(ErrorCode.NOT_NULL.getCode(), "code");
         }
 
         if (object == null) {
@@ -55,12 +55,12 @@ public class AssertUtils {
     }
 
     public static void isArrayEmpty(Object[] array, String... params) {
-        isArrayEmpty(array, ErrorCode.NOT_NULL, params);
+        isArrayEmpty(array, ErrorCode.NOT_NULL.getCode(), params);
     }
 
     public static void isArrayEmpty(Object[] array, Integer code, String... params) {
         if(code == null){
-            throw new RenException(ErrorCode.NOT_NULL, "code");
+            throw new RenException(ErrorCode.NOT_NULL.getCode(), "code");
         }
 
         if(ArrayUtil.isEmpty(array)){
@@ -69,12 +69,12 @@ public class AssertUtils {
     }
 
     public static void isListEmpty(List<?> list, String... params) {
-        isListEmpty(list, ErrorCode.NOT_NULL, params);
+        isListEmpty(list, ErrorCode.NOT_NULL.getCode(), params);
     }
 
     public static void isListEmpty(List<?> list, Integer code, String... params) {
         if(code == null){
-            throw new RenException(ErrorCode.NOT_NULL, "code");
+            throw new RenException(ErrorCode.NOT_NULL.getCode(), "code");
         }
 
         if(CollUtil.isEmpty(list)){
@@ -83,12 +83,12 @@ public class AssertUtils {
     }
 
     public static void isMapEmpty(Map map, String... params) {
-        isMapEmpty(map, ErrorCode.NOT_NULL, params);
+        isMapEmpty(map, ErrorCode.NOT_NULL.getCode(), params);
     }
 
     public static void isMapEmpty(Map map, Integer code, String... params) {
         if(code == null){
-            throw new RenException(ErrorCode.NOT_NULL, "code");
+            throw new RenException(ErrorCode.NOT_NULL.getCode(), "code");
         }
 
         if(MapUtil.isEmpty(map)){

@@ -43,11 +43,11 @@ public class UserServiceImpl extends BaseServiceImpl<UserDao, UserEntity> implem
     @Override
     public Map<String, Object> login(LoginDTO dto) {
         UserEntity user = getByMobile(dto.getMobile());
-        AssertUtils.isNull(user, ErrorCode.ACCOUNT_PASSWORD_ERROR);
+        AssertUtils.isNull(user, ErrorCode.ACCOUNT_PASSWORD_ERROR.getCode());
 
         //密码错误
         if (!user.getPassword().equals(DigestUtil.sha256Hex(dto.getPassword()))) {
-            throw new RenException(ErrorCode.ACCOUNT_PASSWORD_ERROR);
+            throw new RenException(ErrorCode.ACCOUNT_PASSWORD_ERROR.getCode());
         }
 
         //获取登录token

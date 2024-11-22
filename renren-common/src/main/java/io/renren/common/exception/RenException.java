@@ -46,13 +46,13 @@ public class RenException extends RuntimeException {
 
 	public RenException(String msg) {
 		super(msg);
-		this.code = ErrorCode.INTERNAL_SERVER_ERROR;
+		this.code = ErrorCode.INTERNAL_SERVER_ERROR.getCode();
 		this.msg = msg;
 	}
 
 	public RenException(String msg, Throwable e) {
 		super(msg, e);
-		this.code = ErrorCode.INTERNAL_SERVER_ERROR;
+		this.code = ErrorCode.INTERNAL_SERVER_ERROR.getCode();
 		this.msg = msg;
 	}
 

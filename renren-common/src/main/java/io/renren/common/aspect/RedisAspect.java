@@ -41,7 +41,7 @@ public class RedisAspect {
                 result = point.proceed();
             } catch (Exception e) {
                 logger.error("redis error", e);
-                throw new RenException(ErrorCode.REDIS_ERROR);
+                throw new RenException(ErrorCode.REDIS_ERROR.getCode());
             }
         }
         return result;

@@ -39,7 +39,7 @@ public class AliyunCloudStorageService extends AbstractCloudStorageService {
             client.putObject(config.getAliyunBucketName(), path, inputStream);
             client.shutdown();
         } catch (Exception e){
-            throw new RenException(ErrorCode.OSS_UPLOAD_FILE_ERROR, e, "");
+            throw new RenException(ErrorCode.OSS_UPLOAD_FILE_ERROR.getCode(), e, "");
         }
 
         return config.getAliyunDomain() + "/" + path;

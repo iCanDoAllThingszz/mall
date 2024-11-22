@@ -99,7 +99,7 @@ public class SysOssController {
     @RequiresPermissions("sys:oss:all")
     public Result<Map<String, Object>> upload(@RequestParam("file") MultipartFile file) throws Exception {
         if (file.isEmpty()) {
-            return new Result<Map<String, Object>>().error(ErrorCode.UPLOAD_FILE_EMPTY);
+            return new Result<Map<String, Object>>().error(ErrorCode.UPLOAD_FILE_EMPTY.getCode());
         }
 
         //上传文件

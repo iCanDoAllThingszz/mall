@@ -67,7 +67,7 @@ public class Oauth2Realm extends AuthorizingRealm {
         SysUserTokenEntity tokenEntity = shiroService.getByToken(accessToken);
         //token失效
         if (tokenEntity == null || tokenEntity.getExpireDate().getTime() < System.currentTimeMillis()) {
-            throw new IncorrectCredentialsException(MessageUtils.getMessage(ErrorCode.TOKEN_INVALID));
+            throw new IncorrectCredentialsException(MessageUtils.getMessage(ErrorCode.TOKEN_INVALID.getCode()));
         }
 
         //查询用户信息
@@ -82,7 +82,7 @@ public class Oauth2Realm extends AuthorizingRealm {
 
         //账号锁定
         if (userDetail.getStatus() == 0) {
-            throw new LockedAccountException(MessageUtils.getMessage(ErrorCode.ACCOUNT_LOCK));
+            throw new LockedAccountException(MessageUtils.getMessage(ErrorCode.ACCOUNT_LOCKED.getCode()));
         }
 
         SimpleAuthenticationInfo info = new SimpleAuthenticationInfo(userDetail, accessToken, getName());

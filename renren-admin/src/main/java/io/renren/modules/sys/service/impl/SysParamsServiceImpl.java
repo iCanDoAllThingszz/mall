@@ -127,7 +127,7 @@ public class SysParamsServiceImpl extends BaseServiceImpl<SysParamsDao, SysParam
         try {
             return clazz.newInstance();
         } catch (Exception e) {
-            throw new RenException(ErrorCode.PARAMS_GET_ERROR);
+            throw new RenException(ErrorCode.PARAMS_GET_ERROR.getCode());
         }
     }
 

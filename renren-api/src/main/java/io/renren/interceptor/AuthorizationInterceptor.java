@@ -55,13 +55,13 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
 
         //token为空
         if (StrUtil.isBlank(token)) {
-            throw new RenException(ErrorCode.TOKEN_NOT_EMPTY);
+            throw new RenException(ErrorCode.TOKEN_NOT_EMPTY.getCode());
         }
 
         //查询token信息
         TokenEntity tokenEntity = tokenService.getByToken(token);
         if (tokenEntity == null || tokenEntity.getExpireDate().getTime() < System.currentTimeMillis()) {
-            throw new RenException(ErrorCode.TOKEN_INVALID);
+            throw new RenException(ErrorCode.TOKEN_INVALID.getCode());
         }
 
         //设置userId到request里，后续根据userId，获取用户信息

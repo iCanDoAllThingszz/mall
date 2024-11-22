@@ -57,7 +57,7 @@ public class SysMenuServiceImpl extends BaseServiceImpl<SysMenuDao, SysMenuEntit
 
         //上级菜单不能为自身
         if (entity.getId().equals(entity.getPid())) {
-            throw new RenException(ErrorCode.SUPERIOR_MENU_ERROR);
+            throw new RenException(ErrorCode.SUPERIOR_MENU_ERROR.getCode());
         }
 
         //更新菜单

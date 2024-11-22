@@ -41,7 +41,7 @@ public class RenExceptionHandler {
 	@ExceptionHandler(DuplicateKeyException.class)
 	public Result handleDuplicateKeyException(DuplicateKeyException ex){
 		Result result = new Result();
-		result.error(ErrorCode.DB_RECORD_EXISTS);
+		result.error(ErrorCode.DB_RECORD_EXISTS.getCode());
 
 		return result;
 	}

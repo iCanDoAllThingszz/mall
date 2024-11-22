@@ -1366,6 +1366,12 @@ public class BrandDTO implements Serializable {
 ```
 
 ### 2.12 统一异常处理
+定义全局异常处理器: ValidatorExceptionHandler
+
+定义错误响应编码枚举类(5位数字, 前两位约定为业务场景, 后三位约定为错误码): ErrorCode
+
+
+
 
 
 

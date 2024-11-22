@@ -62,7 +62,7 @@ public class LoginController {
     @Parameter(in = ParameterIn.QUERY, ref = "string", name = "uuid", required = true)
     public void captcha(HttpServletResponse response, String uuid) throws IOException {
         //uuid不能为空
-        AssertUtils.isBlank(uuid, ErrorCode.IDENTIFIER_NOT_NULL);
+        AssertUtils.isBlank(uuid, ErrorCode.IDENTIFIER_NOT_NULL.getCode());
 
         //生成验证码
         captchaService.create(response, uuid);
@@ -77,7 +77,7 @@ public class LoginController {
         //验证码是否正确
         boolean flag = captchaService.validate(login.getUuid(), login.getCaptcha());
         if (!flag) {
-            return new Result().error(ErrorCode.CAPTCHA_ERROR);
+            return new Result().error(ErrorCode.CAPTCHA_ERROR.getCode());
         }
 
         //用户信息
@@ -95,7 +95,7 @@ public class LoginController {
             log.setCreatorName(login.getUsername());
             sysLogLoginService.save(log);
 
-            throw new RenException(ErrorCode.ACCOUNT_PASSWORD_ERROR);
+            throw new RenException(ErrorCode.ACCOUNT_PASSWORD_ERROR.getCode());
         }
 
         //密码错误
@@ -105,7 +105,7 @@ public class LoginController {
             log.setCreatorName(user.getUsername());
             sysLogLoginService.save(log);
 
-            throw new RenException(ErrorCode.ACCOUNT_PASSWORD_ERROR);
+            throw new RenException(ErrorCode.ACCOUNT_PASSWORD_ERROR.getCode());
         }
 
         //账号停用
@@ -115,7 +115,7 @@ public class LoginController {
             log.setCreatorName(user.getUsername());
             sysLogLoginService.save(log);
 
-            throw new RenException(ErrorCode.ACCOUNT_DISABLE);
+            throw new RenException(ErrorCode.ACCOUNT_DISABLED.getCode());
         }
 
         //登录成功

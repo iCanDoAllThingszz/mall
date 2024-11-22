@@ -43,7 +43,7 @@ public class SqlFilter {
         //判断是否包含非法字符
         for (String keyword : keywords) {
             if (str.contains(keyword)) {
-                throw new RenException(ErrorCode.INVALID_SYMBOL);
+                throw new RenException(ErrorCode.INVALID_SYMBOL.getCode());
             }
         }
 
