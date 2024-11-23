@@ -1,8 +1,6 @@
 package com.zy.mallproduct;
 
 
-
-
 import com.aliyun.oss.*;
 import com.aliyun.oss.common.auth.CredentialsProviderFactory;
 import com.aliyun.oss.common.auth.EnvironmentVariableCredentialsProvider;
@@ -10,28 +8,20 @@ import com.aliyun.oss.common.comm.SignVersion;
 import com.aliyun.oss.common.utils.StringUtils;
 import com.aliyun.oss.model.PutObjectRequest;
 import com.aliyun.oss.model.PutObjectResult;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.zy.mallproduct.dto.BrandDTO;
 import com.zy.mallproduct.dto.CategoryDTO;
-import com.zy.mallproduct.entity.BrandEntity;
 import com.zy.mallproduct.service.BrandService;
 import com.zy.mallproduct.service.CategoryService;
 import io.renren.common.page.PageData;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
-import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.HashMap;
-import java.util.List;
 
 @SpringBootTest
 class MallProductApplicationTests {
@@ -129,6 +119,7 @@ class MallProductApplicationTests {
         CategoryDTO categoryDTO = new CategoryDTO();
         categoryDTO.setName("true");
         categoryService.save(categoryDTO);
+
     }
 
 }

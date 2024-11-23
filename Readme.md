@@ -1546,6 +1546,90 @@ Bean Validation 规范要求实现（如 Hibernate Validator）支持通过 `Val
 - 后端数据校验 (JSR-303校验实现 jakarta.validation-api + spring-boot-starter-validation)
 - 自定义校验注解 (基于JSR-303规范, 利用spring-boot-starter-validation框架)
 
+## 3. 商品属性管理(属性分组页面开发)
+### 3.1 SKU和SPU
+SPU: Standard Product Unit (标准化产品单元), SPU是商品信息聚合的最小单位, 是一组可复用、易检索的标准化信息的集合。该集合描述了一个产品的特性, 通俗来说, 属性值、特性相同的商品就可以称为是一个SPU
+
+SKU: Stock Keeping Unit (库存量单位), SKU是库存进出量单位, 可以是件、盒、托盘等单位。SKU是物理上不可分割的最小存活单元。
+
+eg: Mate40系列手机是SPU(具有相同的属性: 厂家、品牌、分类), 256G黑色Mate40是SKU
+
+SPU是类, SKU是对象
+
+### 3.2 基本属性和销售属性
+基本属性: SKU都有的通用属性, 比如iphone 15系列手机都是A15芯片
+
+销售属性: SKU特有的属性, 比如iphone 15有黑色/白色, 256G/512G 
+
+mall_pms下 SPU-SKU相关属性表:
+
+![img_42.png](img_42.png)
+
+### 3.3 操作菜单批量生成
+执行如下sql, 批量生成菜单
+
+```sql
+insert  into `sys_menu` (`id`,`pid`,`name`,`url`,`permissions`,`menu_type`,`icon`,`sort`, creator, create_date, update_date) values
+(37,1856306257841893378,'平台属性','','',0,'system',0,1067246875800000001,current_timestamp, current_timestamp),
+(38,37,'属性分组','mallproduct/attrgroup','',0,'tubiao',0,1067246875800000001,current_timestamp, current_timestamp),
+(39,37,'规格参数','mallproduct/baseattr','',0,'log',0,1067246875800000001,current_timestamp, current_timestamp),
+(40,37,'销售属性','mallproduct/saleattr','',0,'zonghe',0,1067246875800000001,current_timestamp, current_timestamp),
+(41,1856306257841893378,'商品维护','mallproduct/spu','',0,'zonghe',0,1067246875800000001,current_timestamp, current_timestamp),
+(42,0,'优惠营销','','',0,'mudedi',0,1067246875800000001,current_timestamp, current_timestamp),
+(43,0,'库存系统','','',0,'shouye',0,1067246875800000001,current_timestamp, current_timestamp),
+(44,0,'订单系统','','',0,'config',0,1067246875800000001,current_timestamp, current_timestamp),
+(45,0,'用户系统','','',0,'admin',0,1067246875800000001,current_timestamp, current_timestamp),
+(46,0,'内容管理','','',0,'sousuo',0,1067246875800000001,current_timestamp, current_timestamp),
+(47,42,'优惠券管理','coupon/coupon','',0,'zhedie',0,1067246875800000001,current_timestamp, current_timestamp),
+(48,42,'发放记录','coupon/history','',0,'sql',0,1067246875800000001,current_timestamp, current_timestamp),
+(49,42,'专题活动','coupon/subject','',0,'tixing',0,1067246875800000001,current_timestamp, current_timestamp),
+(50,42,'秒杀活动','coupon/seckill','',0,'daohang',0,1067246875800000001,current_timestamp, current_timestamp),
+(51,42,'积分维护','coupon/bounds','',0,'geren',0,1067246875800000001,current_timestamp, current_timestamp),
+(52,42,'满减折扣','coupon/full','',0,'shoucang',0,1067246875800000001,current_timestamp, current_timestamp),
+(53,43,'仓库维护','ware/wareinfo','',0,'shouye',0,1067246875800000001,current_timestamp, current_timestamp),
+(54,43,'库存工作单','ware/task','',0,'log',0,1067246875800000001,current_timestamp, current_timestamp),
+(55,43,'商品库存','ware/sku','',0,'jiesuo',0,1067246875800000001,current_timestamp, current_timestamp),
+(56,44,'订单查询','order/order','',0,'zhedie',0,1067246875800000001,current_timestamp, current_timestamp),
+(57,44,'退货单处理','order/return','',0,'shanchu',0,1067246875800000001,current_timestamp, current_timestamp),
+(58,44,'等级规则','order/settings','',0,'system',0,1067246875800000001,current_timestamp, current_timestamp),
+(59,44,'支付流水查询','order/payment','',0,'job',0,1067246875800000001,current_timestamp, current_timestamp),
+(60,44,'退款流水查询','order/refund','',0,'mudedi',0,1067246875800000001,current_timestamp, current_timestamp),
+(61,45,'会员列表','member/member','',0,'geren',0,1067246875800000001,current_timestamp, current_timestamp),
+(62,45,'会员等级','member/level','',0,'tubiao',0,1067246875800000001,current_timestamp, current_timestamp),
+(63,45,'积分变化','member/growth','',0,'bianji',0,1067246875800000001,current_timestamp, current_timestamp),
+(64,45,'统计信息','member/statistics','',0,'sql',0,1067246875800000001,current_timestamp, current_timestamp),
+(65,46,'首页推荐','content/index','',0,'shouye',0,1067246875800000001,current_timestamp, current_timestamp),
+(66,46,'分类热门','content/category','',0,'zhedie',0,1067246875800000001,current_timestamp, current_timestamp),
+(67,46,'评论管理','content/comments','',0,'pinglun',0,1067246875800000001,current_timestamp, current_timestamp),
+(68,41,'spu管理','mallproduct/spu','',0,'config',0,1067246875800000001,current_timestamp, current_timestamp),
+(69,41,'发布商品','mallproduct/spuadd','',0,'bianji',0,1067246875800000001,current_timestamp, current_timestamp),
+(70,43,'采购单维护','','',0,'tubiao',0,1067246875800000001,current_timestamp, current_timestamp),
+(71,70,'采购需求','ware/purchaseitem','',0,'editor',0,1067246875800000001,current_timestamp, current_timestamp),
+(72,70,'采购单','ware/purchase','',0,'menu',0,1067246875800000001,current_timestamp, current_timestamp),
+(73,41,'商品管理','mallproduct/manager','',0,'zonghe',0,1067246875800000001,current_timestamp, current_timestamp),
+(74,42,'会员价格','coupon/memberprice','',0,'admin',0,1067246875800000001,current_timestamp, current_timestamp),
+(75,42,'每日秒杀','coupon/seckillsession','',0,'job',0,1067246875800000001,current_timestamp, current_timestamp);
+```
+
+![img_43.png](img_43.png)
+
+### 3.4 页面布局layout
+新建 mallproduct/attrgroup.vue, 并使用element-plus组件 - <el-row>标签 设置页面布局
+
+### 3.5 三级分类组件功能
+抽取三级分类页面为一个组件, 使其能在其他页面也被使用
+
+新建categoryComponent.vue 作为三级分类表单组件, 在attrgroup.vue中使用该组件
+
+### 3.6 属性分组-表格展示
+开发attrgroup.vue, 对应[属性分组]页面
+
+### 3.7 父子组件传值
+将子组件categoryComponent.vue的值(catId)传给父组件, 父组件通过catId进行查询 展示数据
+
+
+
+
 
 
 
