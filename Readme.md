@@ -1274,6 +1274,11 @@ JSR是Java Specification Requests的缩写, 意思是Java规范提案, 是指向
 
 JSR-303是Java EE 6的一项子规范, 叫做Bean Validation。Hibernate Validator是JSR-303的参考实现, Hibernate Validator提供了JSR-303规范中所有内置Constraint的实现, 除此以外还有一些附加的Constraint。
 
+jakarta.validation-api 关注于定义验证规范和注解，而 spring-boot-starter-validation 关注于在 Spring Boot 应用程序中自动配置和集成验证功能。
+
+- jakarta.validation-api 提供了数据验证的标准 API 和注解，是一个更为通用的 Java 规范，可以在任何遵循该规范的 Java 应用程序中使用。它定义了一系列的标准验证注解（如 @NotNull, @Size, @Min, 等）和API，用于在应用程序中进行数据验证。 作为一个规范，它可以被任何遵循 Jakarta Bean Validation 规范的验证框架实现，如 Hibernate Validator
+- spring-boot-starter-validation 是一个针对 Spring Boot 应用程序的 Starter，它自动配置了 Bean Validation 的实现（如 Hibernate Validator），并提供了与 Spring 框架特性的集成，使得在 Spring Boot 应用程序中使用数据验证变得更加简单和方便
+
 添加 `spring-boot-starter-validation`依赖, 使用相关注解完成校验, 在实体类上添加校验注解
 - @NotNull: 用于校验字段是否为null
 - @NotBlank: 用于校验字段是否为null或只包含空格
@@ -1370,6 +1375,101 @@ public class BrandDTO implements Serializable {
 
 定义错误响应编码枚举类(5位数字, 前两位约定为业务场景, 后三位约定为错误码): ErrorCode
 
+### 2.13 分组异常
+分组校验: 利用JSR303的分组校验功能, 实现添加和修改的校验分组, 参考 BrandDTO, AddGroups, UpdateGroups
+
+分组校验的使用场景: 例如有些业务场景需要校验某些字段(比如新增品牌时, 不需要校验brandId; 但是更新品牌时 需要保证brandId不为空), 就可以使用分组校验
+
+使用@Validated注解开启分组校验(@Valid注解不支持分组校验)
+
+add接口按照AddGroups分组校验:
+```java
+@PostMapping
+@Operation(summary = "保存")
+@LogOperation("保存")
+//@RequiresPermissions("mallproduct:brand:save")
+public Result save(@Validated({AddGroups.class}) @RequestBody BrandDTO dto, BindingResult result){
+        //效验数据
+        ValidatorUtils.validateEntity(dto, AddGroup.class, DefaultGroup.class);
+
+        if(result.hasErrors()){
+        return new Result().error(400, result.getAllErrors().stream().map(String::valueOf).collect(Collectors.joining(",")));
+        }
+
+        brandService.save(dto);
+
+        return new Result();
+}   
+```
+
+update接口按照UpdateGroups分组校验:
+```java
+    @PutMapping
+    @Operation(summary = "修改")
+    @LogOperation("修改")
+    //@RequiresPermissions("mallproduct:brand:update")
+    public Result update(@Validated({UpdateGroups.class}) @RequestBody BrandDTO dto, BindingResult result){
+        //效验数据
+        ValidatorUtils.validateEntity(dto, UpdateGroup.class, DefaultGroup.class);
+
+        //JSR303校验出了非法字段
+        if (result.hasErrors()) {
+            return new Result().error(400, result.getAllErrors().stream().map(String::valueOf).collect(Collectors.joining(",")));
+        }
+
+        brandService.update(dto);
+
+        return new Result();
+    }
+```
+
+> 注意: 当使用分组校验时, 不在对应分组中的校验都会失效
+
+BrandDTO: 
+
+```java
+/**
+ * 品牌
+ *
+ * @author zhaoyu93 zhaoyu93@meituan.com
+ * @since 1.0.0 2024-11-17
+ */
+@Data
+@Schema(name = "品牌")
+public class BrandDTO implements Serializable {
+    private static final long serialVersionUID = 1L;
+
+	@SchemaProperty(name = "品牌id")
+	@NotNull(message = "更新数据品牌时, brandId字段不能为空", groups = {UpdateGroups.class})
+	@Null(message = "添加品牌信息时, brandId字段可为空", groups = {AddGroups.class})
+	private Long brandId;
+
+	@SchemaProperty(name = "品牌名")
+	@NotEmpty(message = "品牌名称字段不能为空", groups = {AddGroups.class})
+	private String name;
+
+	@SchemaProperty(name = "品牌logo地址")
+	@URL(message = "logo的格式必须是url合法地址", groups = {AddGroups.class, UpdateGroups.class})
+	@NotEmpty(message = "logo字段不能为空", groups = {AddGroups.class})
+	private String logo;
+
+	@SchemaProperty(name = "介绍")
+	private String descript;
+
+	@SchemaProperty(name = "显示状态[0-不显示；1-显示]")
+	private Integer showStatus = 1;
+
+	@SchemaProperty(name = "检索首字母")
+	@Pattern(regexp = "^[a-zA-Z]$", message = "检索首字母必须是单个字母", groups = {AddGroups.class, UpdateGroups.class})
+	@NotEmpty(message = "检索首字母字段不能为空", groups = {AddGroups.class})
+	private String firstLetter;
+
+	@SchemaProperty(name = "排序")
+	@Min(value = 0, message = "排序字段不能小于0", groups = {AddGroups.class, UpdateGroups.class})
+	@Max(value = 9999, message = "排序字段不能大于9999", groups = {AddGroups.class, UpdateGroups.class})
+	private Integer sort = 0;
+}
+```
 
 
 

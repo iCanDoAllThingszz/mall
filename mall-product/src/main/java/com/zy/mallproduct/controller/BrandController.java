@@ -1,29 +1,30 @@
 package com.zy.mallproduct.controller;
 
+import com.zy.mallproduct.dto.BrandDTO;
+import com.zy.mallproduct.excel.BrandExcel;
+import com.zy.mallproduct.service.BrandService;
 import io.renren.common.annotation.LogOperation;
 import io.renren.common.constant.Constant;
+import io.renren.common.exception.UpdateGroups;
 import io.renren.common.page.PageData;
 import io.renren.common.utils.ExcelUtils;
 import io.renren.common.utils.Result;
-import io.renren.common.validator.AssertUtils;
 import io.renren.common.validator.ValidatorUtils;
 import io.renren.common.validator.group.AddGroup;
 import io.renren.common.validator.group.DefaultGroup;
 import io.renren.common.validator.group.UpdateGroup;
-import com.zy.mallproduct.dto.BrandDTO;
-import com.zy.mallproduct.excel.BrandExcel;
-import com.zy.mallproduct.service.BrandService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -70,9 +71,14 @@ public class BrandController {
     @Operation(summary = "保存")
     @LogOperation("保存")
     //@RequiresPermissions("mallproduct:brand:save")
-    public Result save(@Valid @RequestBody BrandDTO dto){
+    //jakarta.validation-api 关注于定义验证规范和注解，而 spring-boot-starter-validation 关注于在 Spring Boot 应用程序中自动配置和集成验证功能。
+    public Result save(@Valid @RequestBody BrandDTO dto, BindingResult result){
         //效验数据
         ValidatorUtils.validateEntity(dto, AddGroup.class, DefaultGroup.class);
+
+        if(result.hasErrors()){
+            return new Result().error(400, result.getAllErrors().stream().map(String::valueOf).collect(Collectors.joining(",")));
+        }
 
         brandService.save(dto);
 
@@ -83,7 +89,7 @@ public class BrandController {
     @Operation(summary = "修改")
     @LogOperation("修改")
     //@RequiresPermissions("mallproduct:brand:update")
-    public Result update(@Valid @RequestBody BrandDTO dto, BindingResult result){
+    public Result update(@Validated({UpdateGroups.class}) @RequestBody BrandDTO dto, BindingResult result){
         //效验数据
         ValidatorUtils.validateEntity(dto, UpdateGroup.class, DefaultGroup.class);
 
