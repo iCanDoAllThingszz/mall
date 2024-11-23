@@ -1,5 +1,6 @@
 package com.zy.mallproduct.dto;
 
+import io.renren.common.annotation.ListValue;
 import io.renren.common.exception.AddGroups;
 import io.renren.common.exception.UpdateGroups;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -40,6 +41,8 @@ public class BrandDTO implements Serializable {
 	private String descript;
 
 	@SchemaProperty(name = "显示状态[0-不显示；1-显示]")
+	@ListValue(val = {0, 1}, message = "展示状态必须为0或1", groups = {AddGroups.class, UpdateGroups.class})
+	@NotBlank(message = "展示状态字段不能为空", groups = {AddGroups.class})
 	private Integer showStatus = 1;
 
 	@SchemaProperty(name = "检索首字母")

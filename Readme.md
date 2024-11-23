@@ -1276,12 +1276,24 @@ JSR-303是Java EE 6的一项子规范, 叫做Bean Validation。Hibernate Validat
 
 jakarta.validation-api 关注于定义验证规范和注解，而 spring-boot-starter-validation 关注于在 Spring Boot 应用程序中自动配置和集成验证功能。
 
-- jakarta.validation-api 提供了数据验证的标准 API 和注解，是一个更为通用的 Java 规范，可以在任何遵循该规范的 Java 应用程序中使用。它定义了一系列的标准验证注解（如 @NotNull, @Size, @Min, 等）和API，用于在应用程序中进行数据验证。 作为一个规范，它可以被任何遵循 Jakarta Bean Validation 规范的验证框架实现，如 Hibernate Validator
-- spring-boot-starter-validation 是一个针对 Spring Boot 应用程序的 Starter，它自动配置了 Bean Validation 的实现（如 Hibernate Validator），并提供了与 Spring 框架特性的集成，使得在 Spring Boot 应用程序中使用数据验证变得更加简单和方便
+- jakarta.validation-api (规范, 注解) 提供了数据验证的标准 API 和注解，是一个更为通用的 Java 规范，可以在任何遵循该规范的 Java 应用程序中使用。它定义了一系列的标准验证注解（如 @NotNull, @Size, @Min, 等）和API，用于在应用程序中进行数据验证。 作为一个规范，它可以被任何遵循 Jakarta Bean Validation 规范的验证框架实现，如 Hibernate Validator
+- spring-boot-starter-validation (遵循规范的具体实现) 是一个针对 Spring Boot 应用程序的 Starter，它自动配置了 Bean Validation 的实现（如 Hibernate Validator），并提供了与 Spring 框架特性的集成，使得在 Spring Boot 应用程序中使用数据验证变得更加简单和方便
+
+```markdown
+如果您只引入了 jakarta.validation-api 而没有引入 spring-boot-starter-validation 或其他具体的 Bean Validation 实现（如 Hibernate Validator），那么像 @NotNull 这样的注解本身不会自动生效。原因如下：
+1. API 与实现
+jakarta.validation-api 提供了 Bean Validation 的标准 API，包括各种约束注解（如 @NotNull）、验证接口等。这只是一套规范和接口定义，它本身不包含任何验证逻辑的实现。
+Bean Validation 实现（如 Hibernate Validator）提供了上述 API 的具体实现。这些实现包含了实际执行验证逻辑的代码，能够处理 @NotNull 等注解，并执行相应的验证。
+2. Spring Boot 集成
+spring-boot-starter-validation 是 Spring Boot 的一个 Starter，它自动配置了默认的 Bean Validation 实现（通常是 Hibernate Validator），并且整合了 Spring 的数据绑定和验证机制。引入这个 Starter 后，Spring Boot 会自动应用 Bean Validation 注解（如 @NotNull）到您的模型对象、方法参数等，并在适当的时机执行验证。
+结论
+因此，如果您只引入了 jakarta.validation-api 而没有引入具体的 Bean Validation 实现或 spring-boot-starter-validation，那么 @NotNull 等注解不会自动生效。您需要手动引入一个 Bean Validation 实现（如通过添加 spring-boot-starter-validation 到您的项目依赖中），并且可能需要手动触发验证逻辑，或依赖于 Spring Boot 的自动配置来集成验证功能。
+为了让 @NotNull 等注解生效，建议在 Spring Boot 项目中引入 spring-boot-starter-validation，这样可以确保 Bean Validation 注解被自动处理，并且与 Spring 的其他特性（如控制器请求参数验证）无缝集成。
+```
 
 添加 `spring-boot-starter-validation`依赖, 使用相关注解完成校验, 在实体类上添加校验注解
 - @NotNull: 用于校验字段是否为null
-- @NotBlank: 用于校验字段是否为null或只包含空格
+- @NotBlank: 用于校验字符串是否为null或空串或只包含空格
 - @NotEmpty: 用于校验字段是否为null或字符串长度/集合大小为0
 
 在函数行参的位置加@Valid注解, 开启校验 eg (通过BindingResult对象获取校验的结果信息):
@@ -1470,7 +1482,69 @@ public class BrandDTO implements Serializable {
 	private Integer sort = 0;
 }
 ```
+### 2.14 自定义校验注解
+通过自定义校验注解实现参数的复杂校验(为什么不适用自定义注解 + aop的方式实现? 因为希望我们的注解能打在字段上, 更加灵活 如果拦截请求的话, 由于不同的入参类型都不一样 校验起来代码会写的比较丑)
 
+1. 自定义注解: ListValue
+
+2. 新建ValidationMessages.properties, 用于配置模版消息
+
+3. 自定义校验器: ListValueConstraintValidator
+
+4. 使用自定义校验注解: brandDTO # showStatus
+
+```java
+	@SchemaProperty(name = "显示状态[0-不显示；1-显示]")
+	@ListValue(val = {0, 1}, message = "显示状态字段值非法", groups = {AddGroups.class, UpdateGroups.class})
+	private Integer showStatus = 1;
+```
+
+5. postman测试成功
+
+```markdown
+您的注解 `@ListValue` 被视为一个 Bean Validation 注解而不是一个普通的注解，主要是因为它使用了 `@Constraint` 元注解，并指定了一个或多个验证器类（`validatedBy` 属性）。这是创建自定义约束注解并将其集成到 Bean Validation 框架中的标准方式。下面是一些关键点，解释了为什么 `@ListValue` 是一个 Bean Validation 注解：
+
+##### 使用了 `@Constraint` 元注解
+
+- **`@Constraint` 元注解**：这是 Bean Validation API 提供的一个元注解，用于标记一个注解是 Bean Validation 约束注解。`@Constraint` 元注解的 `validatedBy` 属性指定了实现该约束逻辑的验证器类（`ConstraintValidator` 实现）。这告诉 Bean Validation 实现（如 Hibernate Validator），当遇到被 `@ListValue` 注解的字段或属性时，应该使用指定的验证器类来执行验证逻辑。
+
+##### 指定了验证器类
+
+- **验证器类**：在 `@ListValue` 注解中，通过 `validatedBy = { ListValueConstraintValidator.class }` 指定了一个验证器类。这个验证器类实现了 `ConstraintValidator` 接口，其中包含了具体的验证逻辑。这是 Bean Validation 框架执行自定义验证逻辑的关键。
+
+##### 遵循了 Bean Validation 约定
+
+- **Bean Validation 约定**：`@ListValue` 注解还定义了一些 Bean Validation 规范中常见的属性，如 `message`、`groups` 和 `payload`。这些属性提供了错误消息的定制、验证组的支持以及负载数据的传递，进一步与 Bean Validation 框架的工作方式保持一致。
+
+##### 总结
+
+因此，`@ListValue` 被视为一个 Bean Validation 注解，是因为它通过使用 `@Constraint` 元注解并指定验证器类，遵循了 Bean Validation 规范的约定，从而能够被 Bean Validation 框架识别和处理。这使得 `@ListValue` 注解不仅仅是一个普通的 Java 注解，而是一个能够在 Bean Validation 框架中使用的自定义验证约束注解。
+
+在 Java Bean Validation API 中，尝试读取 `ValidationMessages.properties` 文件并套用消息模板的行为并不是由某个特定注解直接控制的。这是 Bean Validation 规范本身的一部分，是规范定义的默认行为。当你使用 Bean Validation API（如 `@NotNull`, `@Size`, `@Pattern` 等内置约束注解，或者自定义的约束注解如您提供的 `@ListValue`）进行数据验证时，Bean Validation 实现（如 Hibernate Validator）会自动查找并使用 `ValidationMessages.properties` 文件中定义的消息模板。
+
+```
+
+```markdown
+##### 关键点解释
+
+- **Bean Validation 规范**：定义了一套用于 Java 应用程序的数据验证的标准。这包括了一系列的内置约束注解、验证API、以及如何处理验证消息的规则。
+- **消息模板**：在 Bean Validation 中，约束注解的 `message` 属性用于定义验证失败时显示的错误消息。这个属性的值可以是一个硬编码的字符串，也可以是一个引用资源文件中定义的消息模板的键（如 `"{aaa}"`）。
+- **`ValidationMessages.properties`**：这是 Bean Validation 规范定义的默认资源文件，用于存放验证消息模板。Bean Validation 实现在验证过程中会自动查找这个文件，并根据约束注解中的 `message` 属性值中指定的键来获取具体的错误消息文本。
+- **国际化支持**：通过为不同的语言环境提供不同的 `ValidationMessages.properties` 文件（如 `ValidationMessages_en.properties`、`ValidationMessages_zh_CN.properties` 等），Bean Validation 支持错误消息的国际化。
+
+##### 总结
+
+Bean Validation 规范要求实现（如 Hibernate Validator）支持通过 `ValidationMessages.properties` 文件来定义和国际化验证消息。这是规范的一部分，旨在提供一种灵活且强大的方式来自定义和国际化验证错误消息，而不是由某个特定注解直接控制的行为。通过在注解的 `message` 属性中使用消息模板键，并在 `ValidationMessages.properties` 文件中定义这些键的文本，开发者可以轻松地自定义和国际化验证错误消息。
+
+```
+
+### 2.15 品牌管理模块开发总结
+主要针对Brand模块的前后端开发: 包含
+- 品牌模块的前端页面添加, 品牌基本crud操作实现
+- 品牌管理的图片上传阿里云oss实现 (服务端签名直传)
+- 前端表单数据校验
+- 后端数据校验 (JSR-303校验实现 jakarta.validation-api + spring-boot-starter-validation)
+- 自定义校验注解 (基于JSR-303规范, 利用spring-boot-starter-validation框架)
 
 
 
