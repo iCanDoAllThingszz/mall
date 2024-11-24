@@ -1,6 +1,9 @@
 package com.zy.mallproduct.controller;
 
+import com.zy.mallproduct.dto.CategoryDTO;
 import com.zy.mallproduct.entity.CategoryEntity;
+import com.zy.mallproduct.excel.CategoryExcel;
+import com.zy.mallproduct.service.CategoryService;
 import io.renren.common.annotation.LogOperation;
 import io.renren.common.constant.Constant;
 import io.renren.common.page.PageData;
@@ -10,19 +13,14 @@ import io.renren.common.validator.AssertUtils;
 import io.renren.common.validator.ValidatorUtils;
 import io.renren.common.validator.group.AddGroup;
 import io.renren.common.validator.group.DefaultGroup;
-import io.renren.common.validator.group.UpdateGroup;
-import com.zy.mallproduct.dto.CategoryDTO;
-import com.zy.mallproduct.excel.CategoryExcel;
-import com.zy.mallproduct.service.CategoryService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
 import java.util.List;
@@ -132,7 +130,10 @@ public class CategoryController {
     @RequestMapping("/update")
     //@RequiresPermissions("mallproduct:category:update")
     public Result update(@RequestBody CategoryDTO category){
-        categoryService.update(category);
+        //categoryService.update(category);
+
+        //更新category表的同时, 更新brand-category关系表中的category_name
+        categoryService.updateCascade(category);
 
         return new Result();
     }

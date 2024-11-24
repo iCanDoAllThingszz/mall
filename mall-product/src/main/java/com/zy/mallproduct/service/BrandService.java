@@ -12,4 +12,6 @@ import com.zy.mallproduct.entity.BrandEntity;
  */
 public interface BrandService extends CrudService<BrandEntity, BrandDTO> {
 
+    void updateCascade(BrandDTO dto);
+
 }

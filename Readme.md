@@ -1627,9 +1627,101 @@ insert  into `sys_menu` (`id`,`pid`,`name`,`url`,`permissions`,`menu_type`,`icon
 ### 3.7 父子组件传值
 将子组件categoryComponent.vue的值(catId)传给父组件, 父组件通过catId进行查询 展示数据
 
+### 3.8 属性分组 - 数据展示
+之前我们已经实现了点击三级分类表单的叶子结点时, 子组件(三级分类表单)传值(叶子结点data)给父组件, 接下来父组件就要拿到这个data去查询对应的属性分组数据并展示
 
+新增MybatisPlusInterceptor用于日志打印， 修改AttrGroupController # page 中queryWrapper条件
 
+修改前端页面attrgroup.vue 完成点击三级分类叶子节点时, 该节点的属性分组数据展示
 
+### 3.9 属性分组 - 新增属性分组
+修改attrgroup-add-or-update.vue, 完成新增栏的[所属分类id]展示三级分类开发:
+
+![img_44.png](img_44.png)
+
+### 3.10 属性分组 - 修改属性分组
+JavaScript精度丢失问题: 后端存储的数据是1860581631443451906(long), 返回给前端就是1860581631443452000了
+
+```markdown
+您遇到的问题可能是由于 JavaScript 中的数字精度问题导致的。在 JavaScript 中，所有数字都被当作双精度浮点数处理，这可能会导致一些大整数的精度丢失。具体来说，当一个整数超过了 JavaScript 安全整数范围（`Number.MAX_SAFE_INTEGER`，即 `2^53 - 1` 或 `9007199254740991`）时，它就无法被精确地表示。
+
+### 原因分析
+
+1. **JavaScript 的数字精度限制**：
+   - JavaScript 使用 IEEE 754 双精度浮点数格式，这意味着它只能安全地表示一定范围内的整数。
+   - 超过 `Number.MAX_SAFE_INTEGER` 的整数在 JavaScript 中可能会丢失精度。
+
+2. **后端到前端的数据类型转换**：
+   - 如果后端发送的数据是字符串类型，那么前端接收时通常不会有精度问题。
+   - 如果后端发送的数据是数字类型，那么在前端接收时可能会因为 JavaScript 的精度限制而出现问题。
+
+### 解决方案
+
+1. **后端发送数据时使用字符串**：
+   - 让后端将大整数作为字符串发送，而不是数字。这样可以确保前端接收到的数据是准确的。
+
+2. **前端接收数据时转换为字符串**：
+   - 如果后端只能发送数字，那么前端在接收数据后应立即将其转换为字符串，以避免精度问题。
+
+3. **使用第三方库**：
+   - 使用如 `BigInt`（在支持的浏览器中）或 `bignumber.js` 等库来处理大整数。
+
+### 示例代码
+
+**后端（假设使用 Java）**：
+```java
+// 将大整数作为字符串返回
+public String getLargeNumberAsString() {
+    return String.valueOf(1860581631443451906L);
+}
+```
+
+**前端**：
+```javascript
+// 假设从后端接收到的数据是数字类型
+axios.get('/some-endpoint').then((response) => {
+    const largeNumber = response.data; // 这里可能会丢失精度
+    console.log(largeNumber); // 输出可能是错误的值
+
+    // 转换为字符串以保持精度
+    const largeNumberStr = largeNumber.toString();
+    console.log(largeNumberStr); // 输出正确的值
+});
+```
+
+或者，如果前端使用 `BigInt`（注意：`BigInt` 需要后端发送的数据以字符串形式，并且浏览器需要支持 `BigInt`）：
+
+```javascript
+// 假设从后端接收到的数据是字符串类型
+axios.get('/some-endpoint').then((response) => {
+    const largeNumberStr = response.data;
+    const largeNumberBigInt = BigInt(largeNumberStr);
+    console.log(largeNumberBigInt); // 输出正确的 BigInt 值
+});
+```
+
+总之，解决这个问题的关键是确保在数据传输过程中使用适当的数据类型，以避免 JavaScript 的数字精度限制。
+
+```
+```
+
+### 3.11 分页插件
+配置MyBatis-plus分页插件, 真正实现分页功能 : MyBatisPlusConfig
+
+> 注意: 不使用分页插件的话, 分页查询不会真的生效
+
+### 3.12 带条件查询
+
+> SpringBoot项目中, 不使用@EnableTransactionManagement注解开启事务 也能使用事务: https://blog.csdn.net/amadeus_liu2/article/details/132296227
+
+> mall_pms.pms_category_brand_relation 商品类别-品牌关联关系表的设计其实不合理, 这里非主属性(brand_name/category_name)部分依赖了主属性(brand_id & category_id) 没有满足数据库表设计的三范式。这会导致更新异常, 例如当品牌表中的brand_name或者品类表中的category_name更新时, pms_category_brand_relation感知不到, 存储的数据就变成了脏数据的问题 <br/>
+> 因此我们得通过同步数据(当brand_name或者category_name更新时, 同步更新pms_category_brand_relation表来解决), 并且这个同步必须是原子的, 通过事务来控制
+
+修改:
+- BrandController # update (事务已测试 postman->mall-product->BrandController->update-transactional)
+- CategoryController # update (事务已测试 postman->mall-product->CategoryController->update-transactional)
+
+## 4. 规格参数
 
 
 

@@ -17,4 +17,6 @@ public interface CategoryService extends CrudService<CategoryEntity, CategoryDTO
 
     List<CategoryEntity> queryPageTree(Map<String, Object> params);
 
+    void updateCascade(CategoryDTO category);
+
 }

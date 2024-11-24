@@ -1,15 +1,18 @@
 package com.zy.mallproduct.service.impl;
 
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import io.renren.common.service.impl.CrudServiceImpl;
 import com.zy.mallproduct.dao.CategoryDao;
 import com.zy.mallproduct.dto.CategoryDTO;
 import com.zy.mallproduct.entity.CategoryEntity;
+import com.zy.mallproduct.service.CategoryBrandRelationService;
 import com.zy.mallproduct.service.CategoryService;
-import cn.hutool.core.util.StrUtil;
+import io.renren.common.service.impl.CrudServiceImpl;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +30,9 @@ public class CategoryServiceImpl extends CrudServiceImpl<CategoryDao, CategoryEn
 
     @Autowired
     private CategoryDao categoryDao;
+
+    @Autowired
+    private CategoryBrandRelationService categoryBrandRelationService;
 
     @Override
     public QueryWrapper<CategoryEntity> getWrapper(Map<String, Object> params){
@@ -80,6 +86,24 @@ public class CategoryServiceImpl extends CrudServiceImpl<CategoryDao, CategoryEn
                 .collect(Collectors.toList());
 
         return collect;
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+    public void updateCascade(CategoryDTO category) {
+        this.update(category);
+
+        //如果category表中的catelog_name被更新了, 就需要同步级联更新 brand-category 表中的catelog_name; 并且必须注意事务
+        if(StrUtil.isNotBlank(category.getName())){
+            Long catId = category.getCatId();
+            String name = category.getName();
+
+            categoryBrandRelationService.updateCategoryName(catId, name);
+
+            //事务测试
+            System.out.println(1/(category.getCatId()-9990));
+            //todo: 同步更新其他可能有catelog_name字段的表
+        }
     }
 
 

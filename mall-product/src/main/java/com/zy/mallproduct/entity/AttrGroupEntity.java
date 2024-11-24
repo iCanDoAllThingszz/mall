@@ -1,9 +1,10 @@
 package com.zy.mallproduct.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
-
-import java.util.Date;
 
 /**
  * 属性分组
@@ -18,6 +19,7 @@ public class AttrGroupEntity {
     /**
      * 分组id
      */
+    @TableId(type=IdType.AUTO)
 	private Long attrGroupId;
     /**
      * 组名
@@ -38,5 +40,6 @@ public class AttrGroupEntity {
     /**
      * 所属分类id
      */
+    @TableField("catelog_id")
 	private Long catelogId;
 }

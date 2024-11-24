@@ -23,9 +23,13 @@ public class AttrGroupServiceImpl extends CrudServiceImpl<AttrGroupDao, AttrGrou
     @Override
     public QueryWrapper<AttrGroupEntity> getWrapper(Map<String, Object> params){
         String id = (String)params.get("id");
+        String catelogId = (String)params.get("catelogId");
+        String key = (String)params.get("key");
 
         QueryWrapper<AttrGroupEntity> wrapper = new QueryWrapper<>();
         wrapper.eq(StrUtil.isNotBlank(id), "id", id);
+        wrapper.eq(StrUtil.isNotBlank(catelogId) && !catelogId.equals("0"), "catelog_id", catelogId);
+        wrapper.and(StrUtil.isNotBlank(key) , obj -> obj.like("attr_group_name", key).or().like("descript", key));
 
         return wrapper;
     }

@@ -98,7 +98,10 @@ public class BrandController {
             return new Result().error(400, result.getAllErrors().stream().map(String::valueOf).collect(Collectors.joining(",")));
         }
 
-        brandService.update(dto);
+        //brandService.update(dto);
+
+        //更新brand表的同时, 更新brand-category关系表中的brand_name
+        brandService.updateCascade(dto);
 
         return new Result();
     }

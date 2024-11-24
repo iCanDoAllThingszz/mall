@@ -12,4 +12,10 @@ import com.zy.mallproduct.entity.CategoryBrandRelationEntity;
  */
 public interface CategoryBrandRelationService extends CrudService<CategoryBrandRelationEntity, CategoryBrandRelationDTO> {
 
+    void saveDetail(CategoryBrandRelationDTO dto);
+
+    void updateBrandName(Long brandId, String name);
+
+    void updateCategoryName(Long catId, String name);
+
 }
