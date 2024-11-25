@@ -16,6 +16,7 @@ import io.renren.common.page.PageData;
 import io.renren.common.service.CrudService;
 import io.renren.common.utils.ConvertUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.List;
@@ -59,6 +60,7 @@ public abstract class CrudServiceImpl<M extends BaseMapper<T>, T, D> extends Bas
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void save(D dto) {
         T entity = ConvertUtils.sourceToTarget(dto, currentModelClass());
         insert(entity);

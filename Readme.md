@@ -1723,8 +1723,18 @@ axios.get('/some-endpoint').then((response) => {
 
 ## 4. 规格参数
 
+这一章进行【规格参数】页面的开发
 
+### 4.1 规则参数 - 添加数据
+一个属性组应该对应一组规格参数
 
+- 属性组表: pms_attr_group (eg: 主体)
+- 规则参数表: pms_attr (eg: 上市日期, 入网型号)
+- 属性规则参数关联关系表: pms_attr_attrgroup_relation
+
+![img_45.png](img_45.png)
+
+修改 AttrController # add
 
 ## 2. 基础业务
 ## 3. 商城业务

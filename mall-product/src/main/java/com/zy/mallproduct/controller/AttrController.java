@@ -1,5 +1,9 @@
 package com.zy.mallproduct.controller;
 
+import com.zy.mallproduct.AttrVO;
+import com.zy.mallproduct.dto.AttrDTO;
+import com.zy.mallproduct.excel.AttrExcel;
+import com.zy.mallproduct.service.AttrService;
 import io.renren.common.annotation.LogOperation;
 import io.renren.common.constant.Constant;
 import io.renren.common.page.PageData;
@@ -10,18 +14,15 @@ import io.renren.common.validator.ValidatorUtils;
 import io.renren.common.validator.group.AddGroup;
 import io.renren.common.validator.group.DefaultGroup;
 import io.renren.common.validator.group.UpdateGroup;
-import com.zy.mallproduct.dto.AttrDTO;
-import com.zy.mallproduct.excel.AttrExcel;
-import com.zy.mallproduct.service.AttrService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 import java.util.Map;
 
@@ -67,11 +68,14 @@ public class AttrController {
     @Operation(summary = "保存")
     @LogOperation("保存")
     //@RequiresPermissions("mallproduct:attr:save")
-    public Result save(@RequestBody AttrDTO dto){
+    public Result save(@RequestBody AttrVO attrvo){
         //效验数据
-        ValidatorUtils.validateEntity(dto, AddGroup.class, DefaultGroup.class);
+        ValidatorUtils.validateEntity(attrvo, AddGroup.class, DefaultGroup.class);
 
-        attrService.save(dto);
+        //attrService.save(dto);
+
+        //保存规格参数的同时保存 规则参数 - 属性分组 的映射关系
+        attrService.saveAttr(attrvo);
 
         return new Result();
     }
