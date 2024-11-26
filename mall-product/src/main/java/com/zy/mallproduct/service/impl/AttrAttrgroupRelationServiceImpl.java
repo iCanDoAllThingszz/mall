@@ -7,8 +7,11 @@ import com.zy.mallproduct.dto.AttrAttrgroupRelationDTO;
 import com.zy.mallproduct.entity.AttrAttrgroupRelationEntity;
 import com.zy.mallproduct.service.AttrAttrgroupRelationService;
 import cn.hutool.core.util.StrUtil;
+import io.renren.common.utils.ConvertUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -20,15 +23,27 @@ import java.util.Map;
 @Service
 public class AttrAttrgroupRelationServiceImpl extends CrudServiceImpl<AttrAttrgroupRelationDao, AttrAttrgroupRelationEntity, AttrAttrgroupRelationDTO> implements AttrAttrgroupRelationService {
 
+    @Autowired
+    private AttrAttrgroupRelationDao attrAttrgroupRelationDao;
+
     @Override
     public QueryWrapper<AttrAttrgroupRelationEntity> getWrapper(Map<String, Object> params){
         String id = (String)params.get("id");
+        String attrId = (String)params.get("attrId");
 
         QueryWrapper<AttrAttrgroupRelationEntity> wrapper = new QueryWrapper<>();
         wrapper.eq(StrUtil.isNotBlank(id), "id", id);
+        wrapper.eq(StrUtil.isNotBlank(attrId), "attr_id", attrId);
 
         return wrapper;
     }
 
 
+    @Override
+    public AttrAttrgroupRelationDTO query(Long attrId) {
+        HashMap<String, Object> queryParams = new HashMap<>();
+        queryParams.put("attrId", String.valueOf(attrId));
+
+        return ConvertUtils.sourceToTarget(attrAttrgroupRelationDao.selectOne(this.getWrapper(queryParams)), AttrAttrgroupRelationDTO.class);
+    }
 }

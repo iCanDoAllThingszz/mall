@@ -1,9 +1,9 @@
 package com.zy.mallproduct.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
-
-import java.util.Date;
 
 /**
  * 商品属性
@@ -18,6 +18,7 @@ public class AttrEntity {
     /**
      * 属性id
      */
+    @TableId(type= IdType.AUTO)
 	private Long attrId;
     /**
      * 属性名

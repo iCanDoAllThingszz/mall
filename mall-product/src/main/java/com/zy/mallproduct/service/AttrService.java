@@ -1,6 +1,6 @@
 package com.zy.mallproduct.service;
 
-import com.zy.mallproduct.AttrVO;
+import com.zy.mallproduct.vo.AttrVO;
 import io.renren.common.service.CrudService;
 import com.zy.mallproduct.dto.AttrDTO;
 import com.zy.mallproduct.entity.AttrEntity;
@@ -14,5 +14,9 @@ import com.zy.mallproduct.entity.AttrEntity;
 public interface AttrService extends CrudService<AttrEntity, AttrDTO> {
 
     void saveAttr(AttrVO attrvo);
+
+    AttrDTO infoSupply(AttrDTO attrDTO);
+
+    void updateCascade(AttrDTO dto);
 
 }

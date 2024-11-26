@@ -13,4 +13,6 @@ import io.renren.common.service.CrudService;
  */
 public interface AttrAttrgroupRelationService extends CrudService<AttrAttrgroupRelationEntity, AttrAttrgroupRelationDTO> {
 
+    AttrAttrgroupRelationDTO query(Long attrId);
+
 }

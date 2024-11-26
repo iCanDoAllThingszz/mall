@@ -5,7 +5,6 @@ import io.swagger.v3.oas.annotations.media.SchemaProperty;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.util.Date;
 
 
 /**
@@ -46,5 +45,12 @@ public class AttrDTO implements Serializable {
 	@SchemaProperty(name = "快速展示【是否展示在介绍上；0-否 1-是】，在sku中仍然可以调整")
 	private Integer showDesc;
 
+	// 记录规格参数所属的属性组id
+	private Long attrGroupId;
 
+	// 记录规格参数所属的属性组名称
+	private String attrGroupName;
+
+	// 记录规格参数对应的三级品类名称
+	private String catelogName;
 }

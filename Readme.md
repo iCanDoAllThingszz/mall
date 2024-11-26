@@ -1725,7 +1725,7 @@ axios.get('/some-endpoint').then((response) => {
 
 这一章进行【规格参数】页面的开发
 
-### 4.1 规则参数 - 添加数据
+### 4.1 规格参数 - 添加数据
 一个属性组应该对应一组规格参数
 
 - 属性组表: pms_attr_group (eg: 主体)
@@ -1735,6 +1735,66 @@ axios.get('/some-endpoint').then((response) => {
 ![img_45.png](img_45.png)
 
 修改 AttrController # add
+
+### 4.2 规格参数 - 查询规格参数
+查询规格参数, 查询三级类目对应的规格参数 (一个三级类目对应若干个属性组, 一个属性组对应若干个规格参数)
+
+![img_46.png](img_46.png)
+
+修改 AttrController # page, 使其支持通过catelogId查询对应的规格参数
+
+![img_47.png](img_47.png)
+
+如上图, 现在所属分类 & 所属分组还展示不出来 下节完成
+
+### 4.3 规格参数 - 展示数据优化
+通过 pms_attr(规格参数表) 通过 pms_attr_attrgroup_relation (规格参数 - 属性分组关联表) 关联到 pms_attr_group 获得属性分组信息返回给前端展示
+
+级联sql查询数据结果(通过三次点查完成关联查询) 返回给前端, AttrController # page 返回AttrDTO对象
+
+准备测试数据, 测试接口, 测试成功
+
+httpRequest: localhost:9990/mallproduct/attr/page?key=8
+
+```json
+{
+    "code": 0,
+    "msg": "success",
+    "data": {
+        "total": 1,
+        "list": [
+            {
+                "attrId": 8,
+                "attrName": "上市时间",
+                "searchType": 0,
+                "icon": "aaa",
+                "valueSelect": null,
+                "attrType": 0,
+                "enable": 0,
+                "catelogId": 2,
+                "showDesc": null,
+                "attrGroupName": "主体",
+                "catelogName": "手机"
+            }
+        ]
+    }
+}
+```
+
+![img_48.png](img_48.png)
+
+### 4.4 规格参数 - 更新数据
+
+> 思考: 数据库三范式虽然能保证数据的一致性, 但是也导致了查询时需要进行关联查询/多次查询
+
+AttrController # update
+
+级联更新(事务), 更新 pms_attr(规格参数表) 和 pms_attr_attrgroup_relation (规格参数 - 属性分组关联表)
+
+接口测试, 成功
+
+
+
 
 ## 2. 基础业务
 ## 3. 商城业务

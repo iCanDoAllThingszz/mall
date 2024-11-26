@@ -1,9 +1,9 @@
 package com.zy.mallproduct.controller;
 
-import com.zy.mallproduct.AttrVO;
 import com.zy.mallproduct.dto.AttrDTO;
 import com.zy.mallproduct.excel.AttrExcel;
 import com.zy.mallproduct.service.AttrService;
+import com.zy.mallproduct.vo.AttrVO;
 import io.renren.common.annotation.LogOperation;
 import io.renren.common.constant.Constant;
 import io.renren.common.page.PageData;
@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 
 /**
@@ -51,6 +52,12 @@ public class AttrController {
     //@RequiresPermissions("mallproduct:attr:page")
     public Result<PageData<AttrDTO>> page(@Parameter(hidden = true) @RequestParam Map<String, Object> params){
         PageData<AttrDTO> page = attrService.page(params);
+
+        List<AttrDTO> attrDTOS = page.getList();
+
+        //查询每一条规格参数对应的类别名称和属性组名称
+        List<AttrDTO> collect = attrDTOS.stream().map(attrDTO -> attrService.infoSupply(attrDTO)).collect(Collectors.toList());
+        page.setList(collect);
 
         return new Result<PageData<AttrDTO>>().ok(page);
     }
@@ -88,7 +95,7 @@ public class AttrController {
         //效验数据
         ValidatorUtils.validateEntity(dto, UpdateGroup.class, DefaultGroup.class);
 
-        attrService.update(dto);
+        attrService.updateCascade(dto);
 
         return new Result();
     }
