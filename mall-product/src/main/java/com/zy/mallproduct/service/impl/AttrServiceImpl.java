@@ -14,6 +14,7 @@ import com.zy.mallproduct.service.AttrGroupService;
 import com.zy.mallproduct.service.AttrService;
 import com.zy.mallproduct.service.CategoryService;
 import com.zy.mallproduct.vo.AttrVO;
+import io.renren.common.constant.ProductConstant;
 import io.renren.common.service.impl.CrudServiceImpl;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * 商品属性
@@ -45,6 +47,7 @@ public class AttrServiceImpl extends CrudServiceImpl<AttrDao, AttrEntity, AttrDT
         String id = (String)params.get("id");
         String catelogId = (String)params.get("catelogId");
         String key = (String)params.get("key");
+        String attrType = (String)params.get("attrType");
 
         QueryWrapper<AttrEntity> wrapper = new QueryWrapper<>();
         //queryWrapper中, 默认情况下多个条件是and连接的
@@ -57,6 +60,8 @@ public class AttrServiceImpl extends CrudServiceImpl<AttrDao, AttrEntity, AttrDT
         wrapper.and( (w) -> {
             w.like("attr_name", key).or().like("attr_id", key);
         });
+
+        wrapper.eq(StrUtil.isNotBlank(attrType), "attr_type", attrType);
 
         return wrapper;
     }
@@ -95,9 +100,12 @@ public class AttrServiceImpl extends CrudServiceImpl<AttrDao, AttrEntity, AttrDT
         AttrAttrgroupRelationDTO attrAttrgroupRelationDTO = attrAttrgroupRelationService.query(attrDTO.getAttrId());
         Long attrGroupId = attrAttrgroupRelationDTO.getAttrGroupId();
 
-        AttrGroupEntity attrGroupEntity = attrGroupService.selectById(attrGroupId);
-        attrDTO.setAttrGroupName(attrGroupEntity.getAttrGroupName());
-        attrDTO.setAttrGroupId(attrGroupId);
+        // 销售属性无对应属性分组, 这就不用关联了
+        if (attrGroupId != null && Objects.equals(attrDTO.getAttrType(), ProductConstant.AttrTypeEnum.ATTR_TYPE_BASE.getCode())) {
+            AttrGroupEntity attrGroupEntity = attrGroupService.selectById(attrGroupId);
+            attrDTO.setAttrGroupName(attrGroupEntity.getAttrGroupName());
+            attrDTO.setAttrGroupId(attrGroupId);
+        }
 
         return attrDTO;
     }
@@ -110,13 +118,16 @@ public class AttrServiceImpl extends CrudServiceImpl<AttrDao, AttrEntity, AttrDT
 
         this.update(dto);
 
-        AttrAttrgroupRelationEntity attrAttrgroupRelation = new AttrAttrgroupRelationEntity();
-        attrAttrgroupRelation.setAttrId(attrId);
-        attrAttrgroupRelation.setAttrGroupId(attrGroupId);
+        // 销售属性无对应属性分组, 这里就不用级联更新
+        if (Objects.equals(dto.getAttrType(), ProductConstant.AttrTypeEnum.ATTR_TYPE_BASE.getCode())) {
+            AttrAttrgroupRelationEntity attrAttrgroupRelation = new AttrAttrgroupRelationEntity();
+            attrAttrgroupRelation.setAttrId(attrId);
+            attrAttrgroupRelation.setAttrGroupId(attrGroupId);
 
-        UpdateWrapper<AttrAttrgroupRelationEntity> updateWrapper = new UpdateWrapper<>();
-        updateWrapper.eq(attrId!=null, "attr_id", attrId);
-        attrAttrgroupRelationService.update(attrAttrgroupRelation, updateWrapper);
+            UpdateWrapper<AttrAttrgroupRelationEntity> updateWrapper = new UpdateWrapper<>();
+            updateWrapper.eq(attrId!=null, "attr_id", attrId);
+            attrAttrgroupRelationService.update(attrAttrgroupRelation, updateWrapper);
+        }
 
         System.out.println(1/(attrGroupId-999));
     }
