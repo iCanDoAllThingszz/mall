@@ -108,7 +108,8 @@ public class AttrController {
         //效验数据
         AssertUtils.isArrayEmpty(ids, "id");
 
-        attrService.delete(ids);
+        //attrService.delete(ids);
+        attrService.deleteCascade(ids);
 
         return new Result();
     }

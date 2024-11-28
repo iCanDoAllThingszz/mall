@@ -60,3 +60,5 @@ spring:
 # 配置主键自增
 mybatis-plus:
   mapper-locations: classpath:mapper/**/*.xml
+  configuration:
+    map-underscore-to-camel-case: true

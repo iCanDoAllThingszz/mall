@@ -1806,8 +1806,9 @@ pms_attr(规格参数表) # attr_type (属性类型[0-销售属性，1-基本属
 
 1. 修改AttrController的page / update接口, 当规格参数的attr_type为销售属性(0)时, 查询/更新都不需要级联操作 pms_attr_attrgroup_relation (规格参数 - 属性分组关联表)
 2. 新增ProductConstant, 用于存储商品信息常量
+3. 修改AttrController的page / delete接口, 当规格参数的attr_type为基本属性(1)时, 级联删除 pms_attr_attrgroup_relation (规格参数 - 属性分组关联表) 注意@Transactional注解, 测试接口 成功
 
-
+### 4.6 
 
 
 

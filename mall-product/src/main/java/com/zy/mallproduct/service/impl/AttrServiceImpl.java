@@ -131,4 +131,22 @@ public class AttrServiceImpl extends CrudServiceImpl<AttrDao, AttrEntity, AttrDT
 
         System.out.println(1/(attrGroupId-999));
     }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteCascade(Long[] ids) {
+
+        for (Long id : ids) {
+            AttrDTO attrDTO = this.get(id);
+            // 1. 删除规格参数
+            this.deleteById(id);
+
+            if (attrDTO.getAttrType().equals(ProductConstant.AttrTypeEnum.ATTR_TYPE_BASE.getCode())) {
+                // 2. 删除 规格参数-属性分组 关系
+                attrAttrgroupRelationService.deleteByAttrId(id);
+            }
+        }
+    }
+
+
 }

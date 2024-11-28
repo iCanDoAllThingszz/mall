@@ -1,6 +1,7 @@
 package com.zy.mallproduct.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import io.renren.common.service.impl.CrudServiceImpl;
 import com.zy.mallproduct.dao.AttrAttrgroupRelationDao;
 import com.zy.mallproduct.dto.AttrAttrgroupRelationDTO;
@@ -10,6 +11,7 @@ import cn.hutool.core.util.StrUtil;
 import io.renren.common.utils.ConvertUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -45,5 +47,14 @@ public class AttrAttrgroupRelationServiceImpl extends CrudServiceImpl<AttrAttrgr
         queryParams.put("attrId", String.valueOf(attrId));
 
         return ConvertUtils.sourceToTarget(attrAttrgroupRelationDao.selectOne(this.getWrapper(queryParams)), AttrAttrgroupRelationDTO.class);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteByAttrId(Long attrId) {
+        UpdateWrapper<AttrAttrgroupRelationEntity> attrAttrgroupRelationEntityUpdateWrapper = new UpdateWrapper<>();
+        attrAttrgroupRelationEntityUpdateWrapper.eq("attr_id", attrId);
+
+        attrAttrgroupRelationDao.delete(attrAttrgroupRelationEntityUpdateWrapper);
     }
 }

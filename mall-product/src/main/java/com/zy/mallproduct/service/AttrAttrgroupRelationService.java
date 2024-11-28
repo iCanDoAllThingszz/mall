@@ -15,4 +15,6 @@ public interface AttrAttrgroupRelationService extends CrudService<AttrAttrgroupR
 
     AttrAttrgroupRelationDTO query(Long attrId);
 
+    void deleteByAttrId(Long id);
+
 }

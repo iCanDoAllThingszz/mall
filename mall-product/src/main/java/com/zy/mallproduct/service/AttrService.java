@@ -19,4 +19,6 @@ public interface AttrService extends CrudService<AttrEntity, AttrDTO> {
 
     void updateCascade(AttrDTO dto);
 
+    void deleteCascade(Long[] ids);
+
 }

@@ -25,8 +25,8 @@ public interface ProductConstant {
         ATTR_TYPE_BASE(1, "基本属性"),
         ATTR_TYPE_SELL(0, "销售属性");
 
-        private Integer code;
-        private String message;
+        private final Integer code;
+        private final String message;
 
         AttrTypeEnum(Integer code, String message){
             this.code = code;

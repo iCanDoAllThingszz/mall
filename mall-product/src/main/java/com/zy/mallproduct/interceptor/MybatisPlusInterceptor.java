@@ -31,8 +31,11 @@ public class MybatisPlusInterceptor implements Interceptor {
         if (invocation.getTarget() instanceof StatementHandler) {
             StatementHandler statementHandler = (StatementHandler) invocation.getTarget();
             BoundSql boundSql = statementHandler.getBoundSql();
+            Object parameterObject = statementHandler.getParameterHandler().getParameterObject();
+            String parameterObjectString = parameterObject.toString();
+
             String sql = boundSql.getSql();
-            System.out.println("Executing SQL: " + sql);
+            System.out.println("Executing SQL: " + sql + " with parameters: " + parameterObjectString);
         }
 
         return invocation.proceed();
