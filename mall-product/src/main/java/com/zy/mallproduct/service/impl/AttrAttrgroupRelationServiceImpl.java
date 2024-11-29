@@ -1,19 +1,21 @@
 package com.zy.mallproduct.service.impl;
 
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
-import io.renren.common.service.impl.CrudServiceImpl;
 import com.zy.mallproduct.dao.AttrAttrgroupRelationDao;
 import com.zy.mallproduct.dto.AttrAttrgroupRelationDTO;
 import com.zy.mallproduct.entity.AttrAttrgroupRelationEntity;
 import com.zy.mallproduct.service.AttrAttrgroupRelationService;
-import cn.hutool.core.util.StrUtil;
+import io.renren.common.service.impl.CrudServiceImpl;
 import io.renren.common.utils.ConvertUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -32,10 +34,12 @@ public class AttrAttrgroupRelationServiceImpl extends CrudServiceImpl<AttrAttrgr
     public QueryWrapper<AttrAttrgroupRelationEntity> getWrapper(Map<String, Object> params){
         String id = (String)params.get("id");
         String attrId = (String)params.get("attrId");
+        Long attrGroupId = (Long)params.get("attrGroupId");
 
         QueryWrapper<AttrAttrgroupRelationEntity> wrapper = new QueryWrapper<>();
         wrapper.eq(StrUtil.isNotBlank(id), "id", id);
         wrapper.eq(StrUtil.isNotBlank(attrId), "attr_id", attrId);
+        wrapper.eq("attr_group_id", attrGroupId);
 
         return wrapper;
     }
@@ -56,5 +60,18 @@ public class AttrAttrgroupRelationServiceImpl extends CrudServiceImpl<AttrAttrgr
         attrAttrgroupRelationEntityUpdateWrapper.eq("attr_id", attrId);
 
         attrAttrgroupRelationDao.delete(attrAttrgroupRelationEntityUpdateWrapper);
+    }
+
+    @Override
+    public void remove(UpdateWrapper<AttrAttrgroupRelationEntity> updateWrapper) {
+        attrAttrgroupRelationDao.delete(updateWrapper);
+    }
+
+    @Override
+    public void saveBatch(AttrAttrgroupRelationDTO[] dtos) {
+
+        List<AttrAttrgroupRelationEntity> attrAttrgroupRelationEntities = ConvertUtils.sourceToTarget(Arrays.asList(dtos), AttrAttrgroupRelationEntity.class);
+        attrAttrgroupRelationDao.insertBatch(attrAttrgroupRelationEntities);
+
     }
 }

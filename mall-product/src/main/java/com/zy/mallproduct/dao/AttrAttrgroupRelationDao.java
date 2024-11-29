@@ -5,6 +5,8 @@ import com.zy.mallproduct.entity.AttrAttrgroupRelationEntity;
 import io.renren.common.dao.BaseDao;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.List;
+
 /**
  * 属性&属性分组关联
  *
@@ -13,5 +15,7 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface AttrAttrgroupRelationDao extends BaseDao<AttrAttrgroupRelationEntity> {
-	
+
+    void insertBatch(List<AttrAttrgroupRelationEntity> attrAttrgroupRelationEntity);
+
 }

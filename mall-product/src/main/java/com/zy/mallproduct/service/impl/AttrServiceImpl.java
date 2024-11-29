@@ -3,6 +3,8 @@ package com.zy.mallproduct.service.impl;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.zy.mallproduct.dao.AttrAttrgroupRelationDao;
 import com.zy.mallproduct.dao.AttrDao;
 import com.zy.mallproduct.dto.AttrAttrgroupRelationDTO;
 import com.zy.mallproduct.dto.AttrDTO;
@@ -15,14 +17,18 @@ import com.zy.mallproduct.service.AttrService;
 import com.zy.mallproduct.service.CategoryService;
 import com.zy.mallproduct.vo.AttrVO;
 import io.renren.common.constant.ProductConstant;
+import io.renren.common.page.PageData;
 import io.renren.common.service.impl.CrudServiceImpl;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * 商品属性
@@ -41,6 +47,12 @@ public class AttrServiceImpl extends CrudServiceImpl<AttrDao, AttrEntity, AttrDT
 
     @Autowired
     private CategoryService categoryService;
+
+    @Autowired
+    private AttrDao attrDao;
+
+    @Autowired
+    private AttrAttrgroupRelationDao attrAttrgroupRelationDao;
 
     @Override
     public QueryWrapper<AttrEntity> getWrapper(Map<String, Object> params){
@@ -146,6 +158,48 @@ public class AttrServiceImpl extends CrudServiceImpl<AttrDao, AttrEntity, AttrDT
                 attrAttrgroupRelationService.deleteByAttrId(id);
             }
         }
+    }
+
+    @Override
+    public List<AttrDTO> attrGroup(Long attrGroupId) {
+        HashMap<String, Object> queryParam = new HashMap<>();
+        queryParam.put("attrGroupId", attrGroupId);
+
+        List<AttrAttrgroupRelationDTO> list = attrAttrgroupRelationService.list(queryParam);
+
+        return list.stream().filter(x -> x.getAttrId()!=null).map(attrAttrgroupRelationDTO -> this.get(attrAttrgroupRelationDTO.getAttrId())).collect(Collectors.toList());
+    }
+
+    @Override
+    public void removeAttrGroupRel(AttrAttrgroupRelationDTO[] attrAttrgroupRelationDTO) {
+        UpdateWrapper<AttrAttrgroupRelationEntity> updateWrapper = new UpdateWrapper<>();
+
+        for (AttrAttrgroupRelationDTO dto : attrAttrgroupRelationDTO) {
+            updateWrapper.or(w -> w.eq(dto.getAttrId()!=null, "attr_id", dto.getAttrId()).eq(dto.getAttrGroupId()!=null, "attr_group_id", dto.getAttrGroupId()));
+        }
+
+        attrAttrgroupRelationService.remove(updateWrapper);
+    }
+
+    @Override
+    public PageData<AttrDTO> pageNoRelationAttr(Map<String, Object> params) {
+        // 查询当前attrGroupId对应的attrId
+        String attrGroupId = (String)params.get("attrGroupId");
+        QueryWrapper<AttrAttrgroupRelationEntity> queryWrapper = new QueryWrapper<AttrAttrgroupRelationEntity>().eq(attrGroupId != null, "attr_group_id", attrGroupId);
+
+        List<AttrAttrgroupRelationEntity> attrAttrgroupRelationEntities = attrAttrgroupRelationDao.selectList(queryWrapper);
+
+        QueryWrapper<AttrEntity> queryWrapper2 = new QueryWrapper<>();
+
+        for (AttrAttrgroupRelationEntity a : attrAttrgroupRelationEntities) {
+            if(a.getAttrId()!=null){
+                queryWrapper2.and(x -> x.notIn(a.getAttrId()!=null, "attr_id", a.getAttrId()));
+            }
+        }
+
+        IPage<AttrEntity> attrEntityIPage = attrDao.selectPage(this.getPage(params, null, false), queryWrapper2);
+
+        return getPageData(attrEntityIPage, currentDtoClass());
     }
 
 

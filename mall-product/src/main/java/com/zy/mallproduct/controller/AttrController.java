@@ -1,5 +1,6 @@
 package com.zy.mallproduct.controller;
 
+import com.zy.mallproduct.dto.AttrAttrgroupRelationDTO;
 import com.zy.mallproduct.dto.AttrDTO;
 import com.zy.mallproduct.excel.AttrExcel;
 import com.zy.mallproduct.service.AttrService;
@@ -123,5 +124,39 @@ public class AttrController {
 
         ExcelUtils.exportExcelToTarget(response, null, "商品属性", list, AttrExcel.class);
     }
+
+    @GetMapping("attrGroup")
+    @Operation(summary = "根据属性分组id查找对应的若干规格参数")
+    @LogOperation("根据属性分组id查找对应的若干规格参数")
+    //根据属性分组id -> 属性分组-规格参数映射关系表 -> 查询若干个规格参数
+    public Result<List<AttrDTO>> attrGroup(@RequestParam(required = true, name="attrGroupId") Long attrGroupId){
+
+        List<AttrDTO> attrDTOS = attrService.attrGroup(attrGroupId);
+
+        return new Result<List<AttrDTO>>().ok(attrDTOS);
+    }
+
+    @PostMapping("attrGroup/removeRel")
+    @Operation(summary = "解绑属性分组和规格参数")
+    @LogOperation("解绑属性分组和规格参数")
+    //接收若干个{attrId, attrGroupId}, 删除他们的关联关系
+    public Result removeAttrGroupRel(@RequestBody AttrAttrgroupRelationDTO[] params){
+
+        attrService.removeAttrGroupRel(params);
+
+        return new Result();
+    }
+
+    @GetMapping("attrGroup/noRelAttr")
+    @Operation(summary = "查询当前属性分组未关联的规格参数")
+    @LogOperation("查询当前属性分组未关联的规格参数")
+    public Result<List<AttrDTO>> pageNoRelationAttr(@RequestParam Map<String, Object> params){
+        PageData<AttrDTO> page = attrService.pageNoRelationAttr(params);
+
+        return new Result<List<AttrDTO>>().ok(page.getList());
+    }
+
+
+
 
 }

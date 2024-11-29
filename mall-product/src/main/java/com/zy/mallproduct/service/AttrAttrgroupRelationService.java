@@ -1,6 +1,7 @@
 package com.zy.mallproduct.service;
 
 
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.zy.mallproduct.dto.AttrAttrgroupRelationDTO;
 import com.zy.mallproduct.entity.AttrAttrgroupRelationEntity;
 import io.renren.common.service.CrudService;
@@ -16,5 +17,9 @@ public interface AttrAttrgroupRelationService extends CrudService<AttrAttrgroupR
     AttrAttrgroupRelationDTO query(Long attrId);
 
     void deleteByAttrId(Long id);
+
+    void remove(UpdateWrapper<AttrAttrgroupRelationEntity> updateWrapper);
+
+    void saveBatch(AttrAttrgroupRelationDTO[] dtos);
 
 }

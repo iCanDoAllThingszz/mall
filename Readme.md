@@ -832,7 +832,7 @@ spring:
 
 ## 1. 后台管理系统
 
-## 1. 三级类目操作
+## 1. 业务开发 - 三级类目操作
 
 ### 1.1 商品分类后台查询
 执行pms_category.sql 初始化商品分类数据
@@ -1036,7 +1036,7 @@ spring:
 
 2. 完成批量删除功能
 
-## 2. 品牌管理
+## 2. 业务开发 - 品牌管理
 ### 2.1 品牌crud基本操作
 
 > 重要: 模版服务前端renren-ui和后端renren-security是配套的, 我们之前的前端模版用的是renren-ui, 后端用的是renren-fast。这次把后端模版替换为renren-security, 在renren-security分支上进行开发
@@ -1546,7 +1546,7 @@ Bean Validation 规范要求实现（如 Hibernate Validator）支持通过 `Val
 - 后端数据校验 (JSR-303校验实现 jakarta.validation-api + spring-boot-starter-validation)
 - 自定义校验注解 (基于JSR-303规范, 利用spring-boot-starter-validation框架)
 
-## 3. 商品属性管理(属性分组页面开发)
+## 3. 业务开发 - 商品属性管理(属性分组页面开发)
 ### 3.1 SKU和SPU
 SPU: Standard Product Unit (标准化产品单元), SPU是商品信息聚合的最小单位, 是一组可复用、易检索的标准化信息的集合。该集合描述了一个产品的特性, 通俗来说, 属性值、特性相同的商品就可以称为是一个SPU
 
@@ -1721,7 +1721,7 @@ axios.get('/some-endpoint').then((response) => {
 - BrandController # update (事务已测试 postman->mall-product->BrandController->update-transactional)
 - CategoryController # update (事务已测试 postman->mall-product->CategoryController->update-transactional)
 
-## 4. 规格参数
+## 4. 业务开发 - 规格参数
 
 这一章进行【规格参数】页面的开发
 
@@ -1793,7 +1793,7 @@ AttrController # update
 
 接口测试, 成功
 
-### 4.5 销售属性 - 业务代码实现
+### 4.5 销售属性 - 增删改查业务代码实现
 pms_attr(规格参数表) # attr_type (属性类型[0-销售属性，1-基本属性，2-既是销售属性又是基本属性])
 
 销售属性无属性组, 基本属性有属性组
@@ -1808,8 +1808,53 @@ pms_attr(规格参数表) # attr_type (属性类型[0-销售属性，1-基本属
 2. 新增ProductConstant, 用于存储商品信息常量
 3. 修改AttrController的page / delete接口, 当规格参数的attr_type为基本属性(1)时, 级联删除 pms_attr_attrgroup_relation (规格参数 - 属性分组关联表) 注意@Transactional注解, 测试接口 成功
 
-### 4.6 
+###  4.6 属性分组和规格参数 - 关联关系展示
+功能: 点击【属性分组】的【关联】按钮时, 跳出弹窗展示该属性分组对应的规格参数, 在弹窗内可增删改规格参数
 
+eg: 点击【主体】的关联按钮, 展示 上市时间、入网型号、机型等规格参数
+
+整体思路: 根据属性分组id -> 属性分组-规格参数映射关系表 -> 查询若干个规格参数
+
+1. AttrController中新增attrGroup接口, 接口测试 成功
+
+![img_50.png](img_50.png)
+
+![img_51.png](img_51.png)
+
+### 4.7 属性分组和规格参数 - 解除关联关系
+功能: 如上图, 点击解除关联关系后, 属性分组和规格参数解绑
+
+1. AttrController中新增removeAttrGroupRel接口, 测试接口 成功
+
+一个delete语句删除(注意UpdateWrapper的用法):
+```sql
+Executing SQL: DELETE FROM pms_attr_attrgroup_relation      WHERE  ((attr_id = ? AND attr_group_id = ?) OR (attr_id = ? AND attr_group_id = ?)) with parameters: {ew=com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper@665f38a9, param1=com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper@665f38a9}
+```
+
+### 4.8 属性分组和规格参数 - 查询未关联规格参数
+功能:点击[新建关联]为属性分组关联规格参数时, 需要展示当前属性分组未关联规格参数。入参:当前的属性分组attrGroupId, 以及分页参数; 返回当前属性分组attrGroupId未关联的规格参数
+
+![img_52.png](img_52.png)
+
+1. AttrController中新增pageNoRelationAttr接口, 测试接口 成功
+
+### 4.9  属性分组和规格参数 - 确认新增属性分组和规格参数关联关系
+功能:上一节中实现了展示当前属性分组未关联规格参数后, 这一节就要将对应的关联关系保存下来
+
+![img_53.png](img_53.png)
+
+1. AttrAttrgroupRelationController中增加 saveBatch 接口, 测试成功
+
+```xml
+    <insert id="insertBatch">
+        INSERT INTO pms_attr_attrgroup_relation (attr_id, attr_group_id, attr_sort)
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.attrId}, #{item.attrGroupId}, #{item.attrSort})
+        </foreach>
+    </insert>
+```
+## 5. 业务开发 - 商品服务
 
 
 ## 2. 基础业务

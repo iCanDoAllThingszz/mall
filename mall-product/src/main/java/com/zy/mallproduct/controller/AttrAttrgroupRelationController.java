@@ -1,5 +1,8 @@
 package com.zy.mallproduct.controller;
 
+import com.zy.mallproduct.dto.AttrAttrgroupRelationDTO;
+import com.zy.mallproduct.excel.AttrAttrgroupRelationExcel;
+import com.zy.mallproduct.service.AttrAttrgroupRelationService;
 import io.renren.common.annotation.LogOperation;
 import io.renren.common.constant.Constant;
 import io.renren.common.page.PageData;
@@ -10,18 +13,15 @@ import io.renren.common.validator.ValidatorUtils;
 import io.renren.common.validator.group.AddGroup;
 import io.renren.common.validator.group.DefaultGroup;
 import io.renren.common.validator.group.UpdateGroup;
-import com.zy.mallproduct.dto.AttrAttrgroupRelationDTO;
-import com.zy.mallproduct.excel.AttrAttrgroupRelationExcel;
-import com.zy.mallproduct.service.AttrAttrgroupRelationService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 import java.util.Map;
 
@@ -72,6 +72,19 @@ public class AttrAttrgroupRelationController {
         ValidatorUtils.validateEntity(dto, AddGroup.class, DefaultGroup.class);
 
         attrAttrgroupRelationService.save(dto);
+
+        return new Result();
+    }
+
+    @PostMapping("/saveBatch")
+    @Operation(summary = "批量保存")
+    @LogOperation("批量保存")
+    //@RequiresPermissions("mallproduct:attrattrgrouprelation:save")
+    public Result saveBatch(@RequestBody AttrAttrgroupRelationDTO[] dtos){
+        //效验数据
+        ValidatorUtils.validateEntity(dtos, AddGroup.class, DefaultGroup.class);
+
+        attrAttrgroupRelationService.saveBatch(dtos);
 
         return new Result();
     }

@@ -11,4 +11,14 @@
     </resultMap>
 
 
+
+    <insert id="insertBatch">
+        INSERT INTO pms_attr_attrgroup_relation (attr_id, attr_group_id, attr_sort)
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.attrId}, #{item.attrGroupId}, #{item.attrSort})
+        </foreach>
+    </insert>
+
+
 </mapper>
