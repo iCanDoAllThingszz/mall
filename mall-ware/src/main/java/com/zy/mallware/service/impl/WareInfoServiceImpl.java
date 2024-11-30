@@ -24,9 +24,16 @@ public class WareInfoServiceImpl extends CrudServiceImpl<WareInfoDao, WareInfoEn
     @Override
     public QueryWrapper<WareInfoEntity> getWrapper(Map<String, Object> params){
         String id = (String)params.get("id");
+        String wareName = (String)params.get("wareName");
+        String wareAddress = (String)params.get("wareAddress");
+        String wareAreaCode = (String)params.get("wareAreaCode");
 
         QueryWrapper<WareInfoEntity> wrapper = new QueryWrapper<>();
+
         wrapper.eq(StrUtil.isNotBlank(id), "id", id);
+        wrapper.like(StrUtil.isNotBlank(wareName), "name", wareName);
+        wrapper.like(StrUtil.isNotBlank(wareAddress), "address", wareAddress);
+        wrapper.like(StrUtil.isNotBlank(wareAreaCode), "areacode", wareAreaCode);
 
         return wrapper;
     }

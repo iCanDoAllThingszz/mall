@@ -32,4 +32,5 @@ public interface AttrService extends CrudService<AttrEntity, AttrDTO> {
 
     PageData<AttrDTO> pageNoRelationAttr(Map<String, Object> params);
 
+
 }

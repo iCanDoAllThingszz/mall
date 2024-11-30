@@ -1,9 +1,9 @@
 package com.zy.mallware.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
-
-import java.util.Date;
 
 /**
  * 商品库存
@@ -18,6 +18,7 @@ public class WareSkuEntity {
     /**
      * id
      */
+    @TableId(type = IdType.AUTO)
 	private Long id;
     /**
      * sku_id

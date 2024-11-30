@@ -1855,6 +1855,89 @@ Executing SQL: DELETE FROM pms_attr_attrgroup_relation      WHERE  ((attr_id = ?
     </insert>
 ```
 ## 5. 业务开发 - 商品服务
+### 5.1 商品服务 - 新增商品服务和品牌关联
+功能: 发布商品, 补充商品相关的品牌/分类/规格参数等信息, 一个三级分类(category)下可能会对应多个品牌(brand), 三级分类-品牌的关联关系表维护在 mall_pms.pms_category_brand_relation
+
+![img_55.png](img_55.png)
+
+1. BrandController中新增接口findBrandByCatId, 测试成功
+
+> Spring Boot Actuator(致动器) 提供了一组用于监控和管理 Spring Boot 应用程序的功能。在pom.xml中引入 `spring-boot-starter-actuator` 即可使用
+
+### 5.2 商品服务 - 会员模块整合
+1. 修改网关的关于mall-member服务的路由信息
+
+```yaml
+        # 会员服务路由
+        - id: member-route
+          uri: lb://mall-member
+          predicates:
+            - Path=/renren-admin/mallmember/**
+          filters:
+            - StripPrefix=1 # 去掉路径上的前缀1层 renren-admin
+```
+
+### 5.3 商品服务 - 会员等级维护
+- 会员信息表: mall_ums.ums_member
+- 会员登记表: mall_ums.ums_member_level
+
+### 5.4 商品服务 - 规格参数设置
+功能: 根据三级分类ID -> 对应规格参数信息
+
+![img_56.png](img_56.png)
+
+1. AttrController # page 已具备此功能
+
+### 5.5 商品服务 - SPU信息提交
+功能: 提交SKU信息, 包括SPU的基本信息, 基本属性, 销售属性等信息。
+
+SpuInfoController # save 可实现
+
+![img_57.png](img_57.png)
+
+> 在前端提交保存SPU信息时, 如果携带的信息非常多, 比如基本信息、规格参数、图片信息、会员机制等, 仅凭SpuInfoDTO不足以接收所有信息, 我们就可以定义一个SpuDetailInfoDTO接收前端提交的数据, 然后拆解SpuDetailInfoDTO中的内容, `原子性`的存到对应的表中即可
+
+> 增删改查代码都类似 剩下的增删该查部分就快速过了
+
+## 6. 业务开发 - 库存管理
+### 6.1 库存管理 - 仓库列表维护
+mall_wms.wms_ware_info: 仓库信息表
+
+1. 为仓库服务配置网关路由
+
+```yaml
+        # 仓库服务路由
+        - id: ware-route
+          uri: lb://mall-ware
+          predicates:
+            - Path=/renren-admin/mallware/**
+          filters:
+            - StripPrefix=1 # 去掉路径上的前缀1层 renren-admin
+```
+2. 修改 WareInfoController # page, 使其支持模糊查询, 接口测试 成功
+
+3. 为mall-ware服务添加mybatis-plus分页插件和打印sql拦截器
+
+### 6.2 库存管理 - 商品库存管理
+功能: 通过采购单、入库单、退货单等维护商品库存(业务动作的串联后续完成)
+
+mall_wms.wms_ware_sku: 仓库商品库存表
+
+直接修改库存信息: WareSkuController # update
+
+查询仓库的库存信息: WareSkuController # page (修改其底层queryWrapper条件)
+
+### 6.3 库存管理 - 创建采购需求
+功能: 创建采购需求 -> 生成采购单 -> 完成采购, 修改采购需求(回填采购单号, 修改采购需求状态) -> 修改库存
+
+![img_58.png](img_58.png)
+
+mall_wms.wms_purchase_detail: 采购需求明细表
+
+1. 修改 PurchaseDetailController # page 中获得queryWrapper的逻辑, 使其支持根据采购单ID, skuId, sku名称, 仓库ID进行查询
+
+> Consumer: 函数式接口 @FunctionInterface (接受一个参数, 没有返回值), queryWrapper中的and/or等方法的入参就是他。只有具有一个抽象方法的接口才能作为函数式接口, 被lambda表达式简化使用
+
 
 
 ## 2. 基础业务

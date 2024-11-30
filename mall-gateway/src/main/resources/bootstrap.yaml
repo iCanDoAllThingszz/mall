@@ -50,6 +50,20 @@ spring:
             - Path=/renren-admin/oss/**
           filters:
             - StripPrefix=1 # 去掉路径上的前缀1层 renren-admin
+        # 会员服务路由
+        - id: member-route
+          uri: lb://mall-member
+          predicates:
+            - Path=/renren-admin/mallmember/**
+          filters:
+            - StripPrefix=1 # 去掉路径上的前缀1层 renren-admin
+        # 仓库服务路由
+        - id: ware-route
+          uri: lb://mall-ware
+          predicates:
+            - Path=/renren-admin/mallware/**
+          filters:
+            - StripPrefix=1 # 去掉路径上的前缀1层 renren-admin
         # renren-admin路由
         - id: renren-admin-route
           uri: lb://renren-admin

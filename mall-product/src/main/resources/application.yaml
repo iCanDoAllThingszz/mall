@@ -62,3 +62,14 @@ mybatis-plus:
   mapper-locations: classpath:mapper/**/*.xml
   configuration:
     map-underscore-to-camel-case: true
+
+# Spring Boot Actuator 提供了一组用于监控和管理 Spring Boot 应用程序的功能
+# actuator的监控项: 全部
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always

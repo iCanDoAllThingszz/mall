@@ -127,4 +127,12 @@ public class BrandController {
         ExcelUtils.exportExcelToTarget(response, null, "品牌", list, BrandExcel.class);
     }
 
+    @GetMapping("findBrandByCatId")
+    @Operation(summary="根据分类id查询品牌")
+    @LogOperation("根据分类id查询品牌")
+    public Result<List<BrandDTO>> findBrandByCatId(@RequestParam("catId") Long catId){
+
+        return new Result<List<BrandDTO>>().ok(brandService.findBrandByCatId(catId));
+    }
+
 }

@@ -84,6 +84,11 @@
             <artifactId>junit</artifactId>
             <scope>test</scope>
         </dependency>
+        <!--spring-boot actuator依赖, 用于查看spring application中的beans,mappings,health等信息-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
     </dependencies>
 
 </project>

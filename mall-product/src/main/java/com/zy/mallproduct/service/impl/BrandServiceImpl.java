@@ -4,15 +4,19 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.zy.mallproduct.dao.BrandDao;
 import com.zy.mallproduct.dto.BrandDTO;
+import com.zy.mallproduct.dto.CategoryBrandRelationDTO;
 import com.zy.mallproduct.entity.BrandEntity;
 import com.zy.mallproduct.service.BrandService;
 import com.zy.mallproduct.service.CategoryBrandRelationService;
 import io.renren.common.service.impl.CrudServiceImpl;
+import io.renren.common.utils.ConvertUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -26,6 +30,9 @@ public class BrandServiceImpl extends CrudServiceImpl<BrandDao, BrandEntity, Bra
 
     @Autowired
     private CategoryBrandRelationService categoryBrandRelationService;
+
+    @Autowired
+    private BrandDao brandDao;
 
     @Override
     public QueryWrapper<BrandEntity> getWrapper(Map<String, Object> params){
@@ -57,5 +64,30 @@ public class BrandServiceImpl extends CrudServiceImpl<BrandDao, BrandEntity, Bra
             System.out.println(1/(dto.getBrandId()-9990));
             //todo: 同步更新其他可能有brand_name字段的表
         }
+    }
+
+    @Override
+    public List<BrandDTO> findBrandByCatId(Long catId) {
+        HashMap<String, Object> queryParam = new HashMap<>();
+        queryParam.put("catId", catId);
+
+        // 1.查询 三级分类-品牌 关联关系表, 根据三级分类id得到其对应的所有brandId
+        List<CategoryBrandRelationDTO> list = categoryBrandRelationService.list(queryParam);
+
+        // 2.查询所有的brandDTO
+        return this.selectBatch(list);
+    }
+
+    @Override
+    public List<BrandDTO> selectBatch(List<CategoryBrandRelationDTO> list) {
+        QueryWrapper<BrandEntity> brandEntityQueryWrapper = new QueryWrapper<>();
+
+        for (CategoryBrandRelationDTO categoryBrandRelationDTO : list) {
+            if (categoryBrandRelationDTO.getBrandId() != null) {
+                brandEntityQueryWrapper.or(wrapper -> wrapper.eq("brand_id", categoryBrandRelationDTO.getBrandId()));
+            }
+        }
+
+        return ConvertUtils.sourceToTarget(brandDao.selectList(brandEntityQueryWrapper), BrandDTO.class);
     }
 }
