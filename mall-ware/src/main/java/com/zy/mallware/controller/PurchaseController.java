@@ -1,8 +1,10 @@
 package com.zy.mallware.controller;
 
 import com.zy.mallware.dto.PurchaseDTO;
+import com.zy.mallware.dto.WareOrderTaskDTO;
 import com.zy.mallware.excel.PurchaseExcel;
 import com.zy.mallware.service.PurchaseService;
+import com.zy.mallware.service.WareOrderTaskService;
 import io.renren.common.annotation.LogOperation;
 import io.renren.common.constant.Constant;
 import io.renren.common.page.PageData;
@@ -14,14 +16,14 @@ import io.renren.common.validator.group.AddGroup;
 import io.renren.common.validator.group.DefaultGroup;
 import io.renren.common.validator.group.UpdateGroup;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 import java.util.Map;
 
@@ -38,6 +40,9 @@ import java.util.Map;
 public class PurchaseController {
     @Autowired
     private PurchaseService purchaseService;
+
+    @Autowired
+    private WareOrderTaskService wareOrderTaskService;
 
     @GetMapping("page")
     @Operation(summary = "分页")
@@ -110,6 +115,30 @@ public class PurchaseController {
         List<PurchaseDTO> list = purchaseService.list(params);
 
         ExcelUtils.exportExcelToTarget(response, null, "采购信息", list, PurchaseExcel.class);
+    }
+
+    /**
+     * 查询所有状态为新建/已分配的采购单信息
+     * */
+    @GetMapping("/page/newWareOrder")
+    @Operation(summary = "查询所有状态为新建/已分配的采购单信息")
+    @LogOperation("查询所有状态为新建/已分配的采购单信息")
+    public Result<List<WareOrderTaskDTO>> pageNewWareOrder(@RequestParam Map<String, Object> params){
+        PageData<WareOrderTaskDTO> page = wareOrderTaskService.page(params);
+
+        return new Result<List<WareOrderTaskDTO>>().ok(page.getList());
+    }
+
+    /**
+     * 将采购需求合并到某个采购单中, 或者新建采购单
+     * */
+    @GetMapping("/page/newWareOrder")
+    @Operation(summary = "查询所有状态为新建/已分配的采购单信息")
+    @LogOperation("查询所有状态为新建/已分配的采购单信息")
+    public Result<WareOrderTaskDTO> mergeOrAddWareTaskOrder(@RequestBody List<PurchaseDTO> purchaseDTOS, @RequestBody Boolean merge, @RequestBody String wareTaskOrderId){
+        WareOrderTaskDTO wareOrderTaskDTO = purchaseService.mergeOrAddWareTaskOrder(purchaseDTOS, merge, wareTaskOrderId);
+
+        return new Result<WareOrderTaskDTO>().ok(wareOrderTaskDTO);
     }
 
 }
