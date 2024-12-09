@@ -28,7 +28,6 @@ spring:
   #    password: 123456
 
 
-
   jackson:
     time-zone: GMT+8
     date-format: yyyy-MM-dd HH:mm:ss
@@ -46,6 +45,10 @@ spring:
         server-addr: 8.152.0.119:8848
   application:
     name: mall-product
+  data:
+    redis:
+      host: 47.95.17.132
+      port: 6379
 
 #mongodb:
 #  host: localhost

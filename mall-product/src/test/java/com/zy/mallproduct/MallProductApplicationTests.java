@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.redis.core.StringRedisTemplate;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -120,6 +121,20 @@ class MallProductApplicationTests {
         categoryDTO.setName("true");
         categoryService.save(categoryDTO);
 
+    }
+
+
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
+
+    /**
+     * redis连接测试
+     * */
+    @Test
+    public void testRedis(){
+        String name = stringRedisTemplate.opsForValue().get("name");
+
+        System.out.println(name); // zhangsan
     }
 
 }
