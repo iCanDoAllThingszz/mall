@@ -32,3 +32,26 @@ spring:
 ```
 3. 在SpringBootApplicationTest测试类中测试redis, MallProductApplicationTests # testRedis, RedisConfig中新建bean, 测试成功
 
+### 10.4 三级分类缓存
+改造三级分类查询缓存: CategoryController # listTree, 具体修改 CategoryServiceImpl # queryPageTree方法
+
+> 后续可将缓存处理的这部分逻辑封装到aop中, 简化代码
+
+测试接口, 成功命中缓存
+
+### 10.5 三级分类压力测试
+上一节为 CategoryController # listTree 接口增加了缓存, 这一节用JMeter进行一下该接口的压测
+
+### 10.6 缓存击穿, 缓存穿透, 缓存雪崩
+1. 缓存击穿(热点key突然失效 + 大并发请求): 缓存击穿是指一个key非常热点, 在不停的扛着大并发, 大并发集中对这一个点进行访问, 当这个key在失效的瞬间, 大量的请求就击穿了缓存, 直接请求数据库, 产生巨大压力
+2. 缓存穿透(请求数据库&缓存中都不存在的key): 缓存穿透是指用户查询数据, 在数据库中不存在, 缓存中也不存在, 直接请求数据库, 产生巨大压力
+3. 缓存雪崩(大量key在同一时间过期): 大量缓存数据在同一时间过期（失效）或者 Redis 故障宕机时，如果此时有大量的用户请求，都无法在 Redis 中处理，于是全部请求都直接访问数据库，从而导致数据库的压力骤增，严重的会造成数据库宕机，从而形成一系列连锁反应，造成整个系统崩溃，这就是缓存雪崩
+
+缓存中4个问题: 缓存击穿, 缓存穿透, 缓存雪崩, 缓存与服务一致性的解决方案 -> https://blog.csdn.net/zyhlwzy/article/details/110420098
+
+### 10.7 缓存问题的解决方案
+修改 CategoryServiceImpl # queryPageTree方法, 添加缓存击穿, 缓存穿透, 缓存雪崩的解决方案
+
+### 10.8 本地锁的局限性
+
+

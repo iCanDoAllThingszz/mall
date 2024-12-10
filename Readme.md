@@ -281,6 +281,8 @@ docker pull redis
 # -d:后台运行 -p:端口映射 -v:数据挂载 --name:容器名称
 docker run -d -p 6379:6379 --name mall-redis -v /mydata/redis/data:/data -v /mydata/redis/conf:/etc/redis  redis redis-server /etc/redis/redis.conf
 ```
+这里我们给redis设置了密码 参考: https://blog.csdn.net/hecr_mingong/article/details/111690585
+
 因为配置了目录挂载, 所以如果报错 `Fatal error, can't open config file '/etc/redis/redis.conf': No such file or directory`, 我们在/mydata/redis/conf下创建redis.conf文件即可
 
 重新启动容器即可:
